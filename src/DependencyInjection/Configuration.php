@@ -1,10 +1,7 @@
 <?php
 
-
 namespace Fabricio872\RegisterCommand\DependencyInjection;
 
-
-use App\Entity\User;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -17,7 +14,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode("user_class")->defaultValue(User::class)->info('Entity for your user')->end()
+                ->scalarNode("user_class")->defaultValue('App\Entity\User')->info('Entity for your user')->end()
             ->end()
         ;
 

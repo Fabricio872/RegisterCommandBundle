@@ -5,12 +5,23 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults autowire="true" autoconfigure="true"/>
+
         <!-- Explicitly configure the service -->
 
-        <service id="fabricio872.register_command.command.user_register_command" class="Fabricio872\RegisterCommand\Command\UserRegisterCommand" public="true">
+        <service id="fabricio872.register_command.command.user_register_command"
+                 class="Fabricio872\RegisterCommand\Command\UserRegisterCommand"
+                 public="true">
             <tag name="console.command" command="user:register"/>
         </service>
 
-        <service id="Fabricio872\RegisterCommand\Command\UserRegisterCommand" class="fabricio872.register_command.command.user_register_command" public="false" />
+        <service id="Fabricio872\RegisterCommand\Command\UserRegisterCommand"
+                 class="fabricio872.register_command.command.user_register_command"
+                 public="false"/>
+
+        <service id="fabricio872.register_command.annotations.user" class="Fabricio872\RegisterCommand\Annotations\User"
+                 public="true"/>
+        <service id="Fabricio872\RegisterCommand\Annotations\User" class="fabricio872.register_command.annotations.user"
+                 public="false"/>
     </services>
 </container>
