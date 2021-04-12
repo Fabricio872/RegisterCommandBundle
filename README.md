@@ -1,3 +1,7 @@
+
+![GitHub last commit](https://img.shields.io/github/last-commit/Fabricio872/RegisterCommand)
+![GitHub Repo stars](https://img.shields.io/github/stars/Fabricio872/RegisterCommand?style=social)
+
 Installation
 ============
 
