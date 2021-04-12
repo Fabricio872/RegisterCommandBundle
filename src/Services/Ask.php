@@ -83,13 +83,31 @@ class Ask
      * @param RegisterCommand $command
      * @return mixed|null
      */
-    public function getDefaultValue(RegisterCommand $command)
+    private function getDefaultValue(RegisterCommand $command)
     {
         foreach ($command as $annotation => $value) {
             if (substr($annotation, 0, strlen('value')) == 'value') {
-                return $value;
+                return $this->processValue($value, $annotation);
             }
         }
         return null;
+    }
+
+    private function processValue($value, string $annotation)
+    {
+        switch ($annotation) {
+            case 'valueString':
+                return (string)$value;
+            case 'valuePassword':
+                return (string)$this->passwordEncoder->encodePassword(new $this->className, $value);
+            case 'valueArray':
+                return (array)$value;
+            case 'valueInt':
+                return (int)$value;
+            case 'valueFloat':
+                return (float)$value;
+            default:
+                throw new \Exception("Unsupported value type: " . $annotation);
+        }
     }
 }

@@ -19,9 +19,9 @@
                  class="fabricio872.register_command.command.user_register_command"
                  public="false"/>
 
-        <service id="fabricio872.register_command.annotations.user" class="Fabricio872\RegisterCommand\Annotations\User"
+        <service id="fabricio872.register_command.annotations.register_command" class="Fabricio872\RegisterCommand\Annotations\RegisterCommand"
                  public="true"/>
-        <service id="Fabricio872\RegisterCommand\Annotations\User" class="fabricio872.register_command.annotations.user"
+        <service id="Fabricio872\RegisterCommand\Annotations\RegisterCommand" class="fabricio872.register_command.annotations.register_command"
                  public="false"/>
     </services>
 </container>
