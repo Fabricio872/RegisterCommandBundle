@@ -43,9 +43,14 @@ return [
 # Usage
 If your user entity is not `App\Entity\User` set it in services.yaml as:
 ```yaml
-// ...
-register_command:
-    user_class: App\Entity\User
+# config/services.yaml
+
+# ...
+# Default configuration for extension with alias: "register_command"
+RegisterBundle:
+
+    # Entity for your user
+    user_class:           App\Entity\User
 ```
 
 ## Configure Entity
@@ -57,7 +62,8 @@ To field to be asked from terminal you have to set fields to one of those input 
 
 Example with string value:
 
-```phpt
+```php
+// src/Entity/User.php
 // ...
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -79,7 +85,8 @@ To field to be populated automatically with some default value you can use one o
 
 Example for "valueArray":
 
-```phpt
+```php
+// src/Entity/User.php
 // ...
     /**
      * @ORM\Column(type="json")
@@ -93,7 +100,8 @@ Example for "valueArray":
 
 Example for "valuePassword":
 
-```phpt
+```php
+// src/Entity/User.php
 // ...
     /**
      * @var string The hashed password
