@@ -54,7 +54,6 @@ class Ask
         if ($annotation == null) {
             return null;
         }
-        dump($this->getDefaultValue($annotation));
         if ($value = $this->getDefaultValue($annotation)) {
             return $value;
         }
