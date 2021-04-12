@@ -10,41 +10,42 @@ class RegisterCommand
 {
     /**
      * @Enum({"string", "hidden", "hiddenRepeat", "password", "array"})
+     * @var string
      */
-    public string $field;
+    public $field;
 
     /**
      * @var string
      */
-    public string $question;
+    public $question;
 
     /**
      * @var bool
      */
-    public bool $userIdentifier = false;
+    public $userIdentifier = false;
 
     /**
      * @var string
      */
-    public string $valueString;
+    public $valueString;
 
     /**
      * @var string
      */
-    public string $valuePassword;
+    public $valuePassword;
 
     /**
      * @var array
      */
-    public array $valueArray;
+    public $valueArray;
 
     /**
      * @var int
      */
-    public int $valueInt;
+    public $valueInt;
 
     /**
      * @var float
      */
-    public float $valueFloat;
+    public $valueFloat;
 }

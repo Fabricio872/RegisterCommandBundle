@@ -10,11 +10,16 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class Ask
 {
-    private string $className;
-    private Reader $reader;
-    private SymfonyStyle $io;
-    private UserPasswordEncoderInterface $passwordEncoder;
-    private string $userIdentifier = ' ';
+    /** @var string $className */
+    private $className;
+    /** @var Reader $reader */
+    private $reader;
+    /** @var SymfonyStyle $io */
+    private $io;
+    /** @var UserPasswordEncoderInterface $passwordEncoder */
+    private $passwordEncoder;
+    /** @var string $userIdentifier */
+    private $userIdentifier = ' ';
 
     public function __construct(
         string $className,
@@ -49,7 +54,7 @@ class Ask
         if ($annotation == null) {
             return null;
         }
-
+        dump($this->getDefaultValue($annotation));
         if ($value = $this->getDefaultValue($annotation)) {
             return $value;
         }
@@ -86,7 +91,10 @@ class Ask
     private function getDefaultValue(RegisterCommand $command)
     {
         foreach ($command as $annotation => $value) {
-            if (substr($annotation, 0, strlen('value')) == 'value') {
+            if (
+                substr($annotation, 0, strlen('value')) == 'value' &&
+                $value != null
+            ) {
                 return $this->processValue($value, $annotation);
             }
         }

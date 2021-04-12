@@ -7,9 +7,12 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 abstract class QuestionAbstract
 {
-    protected SymfonyStyle $io;
-    protected string $question;
-    protected UserPasswordEncoderInterface $passwordEncoder;
+    /** @var SymfonyStyle $io */
+    protected $io;
+    /** @var string $question */
+    protected $question;
+    /** @var UserPasswordEncoderInterface $passwordEncoder */
+    protected $passwordEncoder;
     protected $user;
 
     /**

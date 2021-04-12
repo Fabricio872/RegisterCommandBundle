@@ -4,7 +4,7 @@ namespace Fabricio872\RegisterCommand\Services\Questions;
 
 class InputArray extends QuestionAbstract
 {
-    private array $values = [];
+    private $values = [];
 
     public function getAnswer()
     {

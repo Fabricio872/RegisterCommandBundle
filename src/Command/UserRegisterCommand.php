@@ -17,11 +17,16 @@ use Symfony\Component\Serializer\Serializer;
 class UserRegisterCommand extends Command
 {
     protected static $defaultDescription = 'Register new user';
-    private string $className;
-    private UserPasswordEncoderInterface $passwordEncoder;
-    private Reader $reader;
-    private SymfonyStyle $io;
-    private EntityManagerInterface $em;
+    /** @var string $className */
+    private $className;
+    /** @var UserPasswordEncoderInterface $passwordEncoder */
+    private $passwordEncoder;
+    /** @var Reader $reader */
+    private $reader;
+    /** @var SymfonyStyle $io */
+    private $io;
+    /** @var EntityManagerInterface $em */
+    private $em;
 
     public function __construct(
         string $className,
