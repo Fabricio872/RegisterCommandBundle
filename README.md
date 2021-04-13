@@ -61,7 +61,7 @@ RegisterBundle:
 ## Configure Entity
 
 To field to be asked from terminal you have to set fields to one of those input types:
-"string", "hidden", "hiddenRepeat", "password", "array"
+"string", "hidden", "hiddenRepeat", "password", "array", "dateTime"
 
 > note: "password" is same s "hiddenRepeat", but it gets encrypted
 
@@ -84,7 +84,7 @@ Example with string value:
 > note: "userIdentifier" is not required and has to be set to only one field and value from that field will be used as success message to identify who was registered 
 
 To field to be populated automatically with some default value you can use one of these inputs:
-"valueString", "valuePassword", "valueArray", "valueInt", "valueFloat"
+"valueString", "valuePassword", "valueArray", "valueInt", "valueFloat", "valueDateTime"
 
 > note: "valuePassword" is same as "valueString" but encrypted
 
@@ -123,6 +123,7 @@ To customize asked question you can use parameter "question"
 
 Example:
 ```php
+// src/Entity/User.php
 //...
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -136,6 +137,22 @@ Example:
 //...
 
 ```
+
+For "valueDateTime" you can specify same value as for DateTime PHP funcition
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="datetime")
+     * @RegisterCommand(
+     *      valueDateTime="now"
+     * )
+     */
+    private $date;
+// ...
+```
+
 Finally, you are ready to register some users.
 
 Execute this in command:

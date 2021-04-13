@@ -9,7 +9,7 @@ namespace Fabricio872\RegisterCommand\Annotations;
 class RegisterCommand
 {
     /**
-     * @Enum({"string", "hidden", "hiddenRepeat", "password", "array"})
+     * @Enum({"string", "hidden", "hiddenRepeat", "password", "array", "dateTime"})
      * @var string
      */
     public $field;
@@ -48,4 +48,10 @@ class RegisterCommand
      * @var float
      */
     public $valueFloat;
+
+    /**
+     * Use datetime input type is same as PHP DateTime function
+     * @var string
+     */
+    public $valueDateTime;
 }

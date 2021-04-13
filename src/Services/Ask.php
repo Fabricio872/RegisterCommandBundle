@@ -45,10 +45,10 @@ class Ask
 
     /**
      * @param string $propertyName
-     * @return string|null
+     * @return string|array|int|float|null
      * @throws \ReflectionException
      */
-    public function ask(string $propertyName): ?string
+    public function ask(string $propertyName)
     {
         $userReflection = new \ReflectionClass($this->userClassName);
         /** @var ?RegisterCommand $annotation */
@@ -124,6 +124,8 @@ class Ask
                 return (int)$value;
             case 'valueFloat':
                 return (float)$value;
+            case 'valueDateTime':
+                return new \DateTime($value);
             default:
                 throw new \Exception("Unsupported value type: " . $annotation);
         }
