@@ -1,4 +1,5 @@
 
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/Fabricio872/RegisterCommand)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fabricio872/RegisterCommand)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Fabricio872/RegisterCommand?style=social)
 
@@ -62,7 +63,7 @@ RegisterBundle:
 To field to be asked from terminal you have to set fields to one of those input types:
 "string", "hidden", "hiddenRepeat", "password", "array"
 
-> note: "password" is same s "hiddenRepeat" but it gets encrypted
+> note: "password" is same s "hiddenRepeat", but it gets encrypted
 
 Example with string value:
 
@@ -116,4 +117,28 @@ Example for "valuePassword":
      */
     private $password;
 // ...
+```
+
+To customize asked question you can use parameter "question"
+
+Example:
+```php
+//...
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @RegisterCommand(
+     *     field="string",
+     *     userIdentifier=true,
+     *     question="Type your email"
+     * )
+     */
+    private $email;
+//...
+
+```
+Finally, you are ready to register some users.
+
+Execute this in command:
+```console
+$ bin/console user:register
 ```
