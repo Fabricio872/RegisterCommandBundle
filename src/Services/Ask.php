@@ -5,13 +5,14 @@ namespace Fabricio872\RegisterCommand\Services;
 use Doctrine\Common\Annotations\Reader;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
+use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class Ask
 {
-    /** @var string $className */
-    private $className;
+    /** @var string $userClassName */
+    private $userClassName;
     /** @var Reader $reader */
     private $reader;
     /** @var SymfonyStyle $io */
@@ -22,13 +23,13 @@ class Ask
     private $userIdentifier = ' ';
 
     public function __construct(
-        string $className,
+        string $userClassName,
         Reader $reader,
         SymfonyStyle $io,
         UserPasswordEncoderInterface $passwordEncoder
     )
     {
-        $this->className = $className;
+        $this->userClassName = $userClassName;
         $this->reader = $reader;
         $this->io = $io;
         $this->passwordEncoder = $passwordEncoder;
@@ -43,14 +44,16 @@ class Ask
     }
 
     /**
-     * @param $property
+     * @param string $propertyName
      * @return string|null
      * @throws \ReflectionException
      */
-    public function ask($property)
+    public function ask(string $propertyName): ?string
     {
-        $userReflection = new \ReflectionClass($this->className);
-        $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($property), RegisterCommand::class);
+        $userReflection = new \ReflectionClass($this->userClassName);
+        /** @var ?RegisterCommand $annotation */
+        $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), RegisterCommand::class);
+
         if ($annotation == null) {
             return null;
         }
@@ -58,20 +61,11 @@ class Ask
             return $value;
         }
 
-        $questionName = 'Fabricio872\RegisterCommand\Services\Questions\Input' . ucfirst(isset($annotation->field) ? $annotation->field : 'string');
         /** @var QuestionAbstract $question */
-        $question = new $questionName(
-            $this->io,
-            $annotation->question ?? 'Set ' . $annotation->field . ' for field ' . $property,
-            $this->passwordEncoder,
-            new $this->className
-        );
+        $question = $this->makeQuestion($annotation, $propertyName);
 
-        /*
-         * Validate input class
-         */
-        if (get_parent_class($question) != QuestionAbstract::class) {
-            throw new \Exception('Input class: ' . get_class($question) . ' must extend ' . QuestionAbstract::class);
+        if (!$question instanceof QuestionAbstract) {
+            throw new \Exception('Input class: ' . get_class($question) . ' must implement ' . QuestionInterface::class);
         }
 
         $answer = $question->getAnswer();
@@ -84,8 +78,25 @@ class Ask
     }
 
     /**
+     * @param RegisterCommand $annotation
+     * @param string $propertyName
+     * @return QuestionInterface
+     */
+    private function makeQuestion(RegisterCommand $annotation, string $propertyName): QuestionInterface
+    {
+        $questionName = 'Fabricio872\RegisterCommand\Services\Questions\Input' . ucfirst($annotation->field ?? 'string');
+
+        return new $questionName(
+            $this->io,
+            $annotation->question ?? 'Set ' . $annotation->field . ' for field ' . $propertyName,
+            $this->passwordEncoder,
+            new $this->userClassName()
+        );
+    }
+
+    /**
      * @param RegisterCommand $command
-     * @return mixed|null
+     * @return string|array|int|float|null
      */
     private function getDefaultValue(RegisterCommand $command)
     {
@@ -106,7 +117,7 @@ class Ask
             case 'valueString':
                 return (string)$value;
             case 'valuePassword':
-                return (string)$this->passwordEncoder->encodePassword(new $this->className, $value);
+                return (string)$this->passwordEncoder->encodePassword(new $this->userClassName, $value);
             case 'valueArray':
                 return (array)$value;
             case 'valueInt':

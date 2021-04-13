@@ -5,7 +5,7 @@ namespace Fabricio872\RegisterCommand\Services\Questions;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-abstract class QuestionAbstract
+abstract class QuestionAbstract implements QuestionInterface
 {
     /** @var SymfonyStyle $io */
     protected $io;
@@ -32,9 +32,4 @@ abstract class QuestionAbstract
         $this->passwordEncoder = $passwordEncoder;
         $this->user = $user;
     }
-
-    /**
-     * @return mixed
-     */
-    public abstract function getAnswer();
 }

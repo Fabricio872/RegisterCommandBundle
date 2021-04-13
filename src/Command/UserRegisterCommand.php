@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -17,8 +18,8 @@ use Symfony\Component\Serializer\Serializer;
 class UserRegisterCommand extends Command
 {
     protected static $defaultDescription = 'Register new user';
-    /** @var string $className */
-    private $className;
+    /** @var string $userClassName */
+    private $userClassName;
     /** @var UserPasswordEncoderInterface $passwordEncoder */
     private $passwordEncoder;
     /** @var Reader $reader */
@@ -28,13 +29,20 @@ class UserRegisterCommand extends Command
     /** @var EntityManagerInterface $em */
     private $em;
 
+    /**
+     * UserRegisterCommand constructor.
+     * @param string $userClassName
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param Reader $reader
+     * @param EntityManagerInterface $em
+     */
     public function __construct(
-        string $className,
+        string $userClassName,
         UserPasswordEncoderInterface $passwordEncoder,
         Reader $reader,
         EntityManagerInterface $em)
     {
-        $this->className = $className;
+        $this->userClassName = $userClassName;
         parent::__construct();
         $this->passwordEncoder = $passwordEncoder;
         $this->reader = $reader;
@@ -43,28 +51,39 @@ class UserRegisterCommand extends Command
 
     protected function configure()
     {
-        $this
-            ->setDescription(self::$defaultDescription);
+        $this->setDescription(self::$defaultDescription);
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \ReflectionException
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $userReflection = new \ReflectionClass($this->className);
+        $userClassReflection = new \ReflectionClass($this->userClassName);
+
+        $userClass = new $this->userClassName();
+        if (!$userClass instanceof UserInterface) {
+            throw new \Exception("Provided user must extend " . UserInterface::class);
+        }
 
         $data = [];
         $ask = new Ask(
-            $this->className,
+            $this->userClassName,
             $this->reader,
             $this->io,
             $this->passwordEncoder
         );
-        foreach ($userReflection->getProperties() as $property) {
+        foreach ($userClassReflection->getProperties() as $property) {
             $data[$property->getName()] = $ask->ask($property->getName());
         }
 
-        $user = $this->getSerializer()->denormalize($data, $this->className);
+        $user = $this->getSerializer()->denormalize($data, $this->userClassName);
 
         $this->em->persist($user);
         $this->em->flush();
@@ -73,7 +92,10 @@ class UserRegisterCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function getSerializer()
+    /**
+     * @return Serializer
+     */
+    private function getSerializer(): Serializer
     {
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
