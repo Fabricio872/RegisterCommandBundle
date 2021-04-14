@@ -89,7 +89,7 @@ class UserRegisterCommand extends Command
         $this->em->flush();
 
         $this->io->success('User' . $ask->getUserIdentifier() . 'registered.');
-        return Command::SUCCESS;
+        return 0;
     }
 
     /**

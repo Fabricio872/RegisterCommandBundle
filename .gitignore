@@ -15,4 +15,10 @@
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 
+###> PhpStorm ###
 .idea/
+###< PhpStorm ###
+
+###> Composer ###
+composer.lock
+###> Composer ###
