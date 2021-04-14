@@ -19,6 +19,16 @@
                  class="fabricio872.register_command.command.user_register_command"
                  public="false"/>
 
+        <service id="fabricio872.register_command.command.user_list_command"
+                 class="Fabricio872\RegisterCommand\Command\UserListCommand"
+                 public="true">
+            <tag name="console.command" command="user:list"/>
+        </service>
+
+        <service id="Fabricio872\RegisterCommand\Command\UserListCommand"
+                 class="fabricio872.register_command.command.user_list_command"
+                 public="false"/>
+
         <service id="fabricio872.register_command.annotations.register_command" class="Fabricio872\RegisterCommand\Annotations\RegisterCommand"
                  public="true"/>
         <service id="Fabricio872\RegisterCommand\Annotations\RegisterCommand" class="fabricio872.register_command.annotations.register_command"
