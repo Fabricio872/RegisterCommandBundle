@@ -103,7 +103,7 @@ class Ask
         foreach ($command as $annotation => $value) {
             if (
                 substr($annotation, 0, strlen('value')) == 'value' &&
-                $value != null
+                $value !== null
             ) {
                 return $this->processValue($value, $annotation);
             }
