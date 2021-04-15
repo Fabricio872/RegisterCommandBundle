@@ -2,6 +2,7 @@
 
 namespace Fabricio872\RegisterCommand\Command;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Fabricio872\RegisterCommand\Services\ObjectToTable;
 use Symfony\Component\Console\Command\Command;
@@ -57,6 +58,12 @@ class UserListCommand extends Command
         /** @var int $limit */
         $limit = $input->getOption('limit');
 
+        return $this->draw($io, $page, $limit);
+    }
+
+    private function draw(SymfonyStyle $io, int $page, int $limit)
+    {
+
         $counetr = $this->em
             ->getRepository($this->userClassName)
             ->count([]);
@@ -66,13 +73,23 @@ class UserListCommand extends Command
 
         $table = new ObjectToTable(
             $userList,
-            $io
+            $io,
+            $limit
         );
 
-        $table->getTable();
+        $table = $table->makeTable();
+        $table->setFooterTitle("Page $page / " . ceil($counetr / $limit));
+        $table->render();
+        $io->writeln('To exit type "q" and pres <return>');
 
-        $io->success("$page $limit");
-
+        if (ceil($counetr / $limit) > 1) {
+            $page = $io->ask("Page", ($page < ceil($counetr / $limit)) ? $page + 1 : null);
+            if (!is_int($page) || $page == null) {
+                $io->writeln('Bye');
+                return 0;
+            }
+            $this->draw($io, $page, $limit);
+        }
         return 0;
     }
 }

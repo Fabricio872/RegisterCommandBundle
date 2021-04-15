@@ -2,9 +2,19 @@
 
 namespace Fabricio872\RegisterCommand\Services;
 
+use Doctrine\Common\Annotations\Reader;
+use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
+use Fabricio872\RegisterCommand\Serializer\UserEntityNormalizer;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class ObjectToTable
 {
@@ -16,80 +26,78 @@ class ObjectToTable
      * @var OutputInterface
      */
     private $output;
+    /**
+     * @var int
+     */
+    private $maxRows;
 
     public function __construct(
         iterable $users,
-        OutputInterface $output
+        OutputInterface $output,
+        int $maxRows
     )
     {
         $this->users = $users;
         $this->output = $output;
+        $this->maxRows = $maxRows;
     }
 
-    public function getTable()
-    {
-        $this->makeTable();
-
-    }
-
-    private function makeTable()
+    public function makeTable(): Table
     {
         $table = new Table($this->output);
-
         $table->setHeaders(
-            $this->getUserGetters($this->users[0], true)
+            array_map(function ($getter) {
+                return substr($getter, 3);
+            }, $this->getUserGetters($this->users[0]))
         );
+        $table->setRows(
+            array_merge(
+                array_map(function ($user) {
+                    return $this->makeCols($user);
+                }, $this->users),
+                $this->emptyRows()
+            )
+        );
+        $table->setStyle('box');
+//        $table->;
 
-        $table->setRows(array_map('self::makeCols', $this->users));
-
-        $table->render();
+        return $table;
     }
 
-    private static function makeCols($user)
+    private function makeCols($user)
     {
-        $userArray = [];
-        foreach (self::getUserGetters($user) as $getter) {
-            $userArray[] = self::serializeCol($user->$getter());
-        }
-        return $userArray;
+        return $this->getSerializer()->normalize($user);
     }
 
     /**
      * @return array
      */
-    private static function getUserGetters(UserInterface $user, bool $unGetter = false): array
+    private function emptyRows(): array
     {
-        $methods = [];
-        foreach (get_class_methods($user) as $method) {
-            if (substr($method, 0, 3) == 'get') {
-                if ($unGetter) {
-                    $methods[] = substr($method, 3);
-                } else {
-                    $methods[] = $method;
-                }
-            }
+        $rows = [];
+        for ($i = count($this->users); $i < $this->maxRows; $i++) {
+            $rows[] = [''];
         }
-        return $methods;
+        return $rows;
     }
 
-    private static function serializeCol($col): string
+    /**
+     * @return array
+     */
+    private function getUserGetters(UserInterface $user): array
     {
-        if (is_numeric($col)) {
-            return $col;
-        }
-        if (is_null($col)) {
-            return 'NULL';
-        }
-        if (is_array($col)) {
-            return implode(', ', $col);
-        }
-        if (is_string($col)) {
-            return $col;
-        }
-        if ($col instanceof \DateTime) {
-            return $col->format('c');
-        }
+        return array_filter(get_class_methods($user), function ($var) {
+            return substr($var, 0, 3) == 'get';
+        });
+    }
 
-        return 'Unknown datatype';
+    /**
+     * @return Serializer
+     */
+    private function getSerializer(): Serializer
+    {
+        $normalizers = [new UserEntityNormalizer($this->getUserGetters($this->users[0]))];
+
+        return new Serializer($normalizers);
     }
 }
