@@ -1,6 +1,7 @@
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/Fabricio872/RegisterCommand)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fabricio872/RegisterCommand)
+[![Build Status](https://travis-ci.org/Fabricio872/RegisterCommand.svg?branch=main)](https://travis-ci.org/Fabricio872/RegisterCommand)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Fabricio872/RegisterCommand?style=social)
 
 Installation
@@ -155,7 +156,12 @@ For "valueDateTime" you can specify same value as for DateTime PHP funcition
 
 Finally, you are ready to register some users.
 
-Execute this in command:
+Execute this command:
 ```console
 $ bin/console user:register
+```
+
+To list all existing users execute this:
+```console
+$ bin/console user:list
 ```

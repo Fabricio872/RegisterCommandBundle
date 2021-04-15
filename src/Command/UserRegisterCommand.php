@@ -69,7 +69,7 @@ class UserRegisterCommand extends Command
 
         $userClass = new $this->userClassName();
         if (!$userClass instanceof UserInterface) {
-            throw new \Exception("Provided user must extend " . UserInterface::class);
+            throw new \Exception("Provided user must implement " . UserInterface::class);
         }
 
         $data = [];
