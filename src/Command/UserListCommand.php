@@ -84,7 +84,7 @@ class UserListCommand extends Command
 
         if (ceil($counetr / $limit) > 1) {
             $page = $io->ask("Page", ($page < ceil($counetr / $limit)) ? $page + 1 : null);
-            if (!is_int($page) || $page == null) {
+            if ((int)$page == 0) {
                 $io->writeln('Bye');
                 return 0;
             }

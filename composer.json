@@ -11,15 +11,15 @@
     ],
     "require": {
         "php": "^7.2",
-        "symfony/config": "^4.4",
-        "symfony/dependency-injection": "^4.4",
-        "symfony/http-kernel": "^4.4",
+        "symfony/config": "^4.4|^5",
+        "symfony/dependency-injection": "^4.4|^5",
+        "symfony/http-kernel": "^4.4|^5",
         "symfony/orm-pack": "^2.1",
-        "symfony/security-bundle": "^4.4",
-        "symfony/serializer": "^4.4"
+        "symfony/security-bundle": "^4.4|^5",
+        "symfony/serializer": "^4.4|^5"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.4"
+        "symfony/phpunit-bridge": "^4.4|^5"
     },
     "config": {
         "optimize-autoloader": true,
