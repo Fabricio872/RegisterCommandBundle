@@ -2,7 +2,6 @@
 
 namespace Fabricio872\RegisterCommand\Command;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Fabricio872\RegisterCommand\Services\ObjectToTable;
 use Symfony\Component\Console\Command\Command;
@@ -12,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\User\UserInterface;
+use function Composer\Autoload\includeFile;
 
 class UserListCommand extends Command
 {
@@ -21,6 +21,10 @@ class UserListCommand extends Command
      * @var string
      */
     private $userClassName;
+    /**
+     * @var SymfonyStyle
+     */
+    private $io;
     /**
      * @var EntityManagerInterface
      */
@@ -51,7 +55,7 @@ class UserListCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
+        $this->io = new SymfonyStyle($input, $output);
         /** @var int $colWidth */
         $this->colWidth = $input->getOption('col-width');
 
@@ -65,12 +69,11 @@ class UserListCommand extends Command
         /** @var int $limit */
         $limit = $input->getOption('limit');
 
-        return $this->draw($io, $page, $limit);
+        return $this->draw($page, $limit);
     }
 
-    private function draw(SymfonyStyle $io, int $page, int $limit)
+    private function draw(int $page, int $limit)
     {
-
         $counetr = $this->em
             ->getRepository($this->userClassName)
             ->count([]);
@@ -78,10 +81,14 @@ class UserListCommand extends Command
             ->getRepository($this->userClassName)
             ->findBy([], [], $limit, $limit * ($page - 1));
 
+        if ($counetr == 0) {
+            $this->io->warning("Table is empty");
+            return 0;
+        }
+
         $objectToTable = new ObjectToTable(
             $userList,
-            $io,
-            $limit
+            $this->io
         );
 
         $table = $objectToTable->makeTable();
@@ -92,16 +99,42 @@ class UserListCommand extends Command
         }
 
         $table->render();
-        $io->writeln('To exit type "q" and pres <return>');
+        $this->io->writeln('To exit type "q" and pres <return>');
 
         if (ceil($counetr / $limit) > 1) {
-            $page = $io->ask("Page", ($page < ceil($counetr / $limit)) ? $page + 1 : null);
-            if ((int)$page == 0) {
-                $io->writeln('Bye');
+            $page = $this->getPage($page, ceil($counetr / $limit));
+
+            if ($page === null){
                 return 0;
             }
-            $this->draw($io, $page, $limit);
+
+            $this->draw($page, $limit);
         }
         return 0;
+    }
+
+    private function getPage(int $currentPage, int $totalPages): ?int
+    {
+        $page = $this->io->ask("Page", ($currentPage < $totalPages) ? $currentPage + 1 : null);
+        dump(strtolower($page));
+        if (strtolower($page) == 'q') {
+            $this->io->writeln('Bye');
+            return null;
+        }
+        if (!is_numeric($page)) {
+            $this->io->writeln('Unknown input');
+            return null;
+        }
+        if ($page < 1) {
+            $this->io->warning("Page must be higher or equal to 1");
+            return $this->getPage($currentPage, $totalPages);
+        }
+
+        if ($page > $totalPages) {
+            $this->io->warning("Page must be lower or equal to $totalPages");
+            return $this->getPage($currentPage, $totalPages);
+        }
+
+        return $page;
     }
 }

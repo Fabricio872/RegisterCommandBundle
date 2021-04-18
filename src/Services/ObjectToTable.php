@@ -18,20 +18,14 @@ class ObjectToTable
      * @var OutputInterface
      */
     private $output;
-    /**
-     * @var int
-     */
-    private $maxRows;
 
     public function __construct(
         iterable $users,
-        OutputInterface $output,
-        int $maxRows
+        OutputInterface $output
     )
     {
         $this->users = $users;
         $this->output = $output;
-        $this->maxRows = $maxRows;
     }
 
     public function makeTable(): Table
@@ -48,7 +42,6 @@ class ObjectToTable
             }, $this->users)
         );
         $table->setStyle('box');
-//        $table->;
 
         return $table;
     }
