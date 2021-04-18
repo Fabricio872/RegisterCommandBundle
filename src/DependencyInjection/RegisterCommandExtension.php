@@ -22,5 +22,7 @@ class RegisterCommandExtension extends Extension
 
         $listDefinition = $container->getDefinition('fabricio872.register_command.command.user_list_command');
         $listDefinition->setArgument(0, $config['user_class']);
+        $listDefinition->setArgument(1, $config['table_limit']);
+        $listDefinition->setArgument(2, $config['max_col_width']);
     }
 }

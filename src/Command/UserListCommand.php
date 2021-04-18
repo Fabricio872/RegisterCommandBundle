@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\User\UserInterface;
-use function Composer\Autoload\includeFile;
 
 class UserListCommand extends Command
 {
@@ -21,6 +20,14 @@ class UserListCommand extends Command
      * @var string
      */
     private $userClassName;
+    /**
+     * @var int
+     */
+    private $tableLimit;
+    /**
+     * @var int
+     */
+    private $maxColWidth;
     /**
      * @var SymfonyStyle
      */
@@ -33,15 +40,27 @@ class UserListCommand extends Command
      * @var int
      */
     private $colWidth;
+    /**
+     * @var int
+     */
+    private $totalPages;
+    /**
+     * @var int
+     */
+    private $currentPage = 0;
 
     public function __construct(
         string $userClassName,
+        int $tableLimit,
+        int $maxColWidth,
         EntityManagerInterface $em
     )
     {
-        parent::__construct();
         $this->userClassName = $userClassName;
+        $this->tableLimit = $tableLimit;
+        $this->maxColWidth = $maxColWidth;
         $this->em = $em;
+        parent::__construct();
     }
 
     protected function configure()
@@ -49,8 +68,8 @@ class UserListCommand extends Command
         $this
             ->setDescription(self::$defaultDescription)
             ->addArgument('page', InputArgument::OPTIONAL, 'Page', 1)
-            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit rows on single page', 10)
-            ->addOption('col-width', 'w', InputOption::VALUE_REQUIRED, 'Set maximum width for one column', 64);
+            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit rows on single page', $this->tableLimit)
+            ->addOption('col-width', 'w', InputOption::VALUE_REQUIRED, 'Set maximum width for one column', $this->maxColWidth);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -59,13 +78,20 @@ class UserListCommand extends Command
         /** @var int $colWidth */
         $this->colWidth = $input->getOption('col-width');
 
+        $this->totalPages = $this->em
+            ->getRepository($this->userClassName)
+            ->count([]);
+
         $userClass = new $this->userClassName();
         if (!$userClass instanceof UserInterface) {
             throw new \Exception("Provided user must implement " . UserInterface::class);
         }
 
         /** @var int $page */
-        $page = $input->getArgument('page');
+        $page = $this->getPage($input->getArgument('page'));
+        if ($page === null) {
+            return 0;
+        }
         /** @var int $limit */
         $limit = $input->getOption('limit');
 
@@ -74,14 +100,11 @@ class UserListCommand extends Command
 
     private function draw(int $page, int $limit)
     {
-        $counetr = $this->em
-            ->getRepository($this->userClassName)
-            ->count([]);
         $userList = $this->em
             ->getRepository($this->userClassName)
             ->findBy([], [], $limit, $limit * ($page - 1));
 
-        if ($counetr == 0) {
+        if ($this->totalPages == 0) {
             $this->io->warning("Table is empty");
             return 0;
         }
@@ -92,19 +115,19 @@ class UserListCommand extends Command
         );
 
         $table = $objectToTable->makeTable();
-        $table->setFooterTitle("Page $page / " . ceil($counetr / $limit));
+        $table->setFooterTitle("Page $page / " . ceil($this->totalPages / $limit));
 
         for ($i = 0; $i < count($objectToTable->getUserGetters(new $this->userClassName)); $i++) {
             $table->setColumnMaxWidth($i, $this->colWidth);
         }
 
         $table->render();
-        $this->io->writeln('To exit type "q" and pres <return>');
 
-        if (ceil($counetr / $limit) > 1) {
-            $page = $this->getPage($page, ceil($counetr / $limit));
+        if (ceil($this->totalPages / $limit) > 1) {
+            $this->io->writeln('To exit type "q" and pres <return>');
+            $page = $this->getPage($this->askPage());
 
-            if ($page === null){
+            if ($page === null) {
                 return 0;
             }
 
@@ -113,10 +136,8 @@ class UserListCommand extends Command
         return 0;
     }
 
-    private function getPage(int $currentPage, int $totalPages): ?int
+    private function getPage($page): ?int
     {
-        $page = $this->io->ask("Page", ($currentPage < $totalPages) ? $currentPage + 1 : null);
-        dump(strtolower($page));
         if (strtolower($page) == 'q') {
             $this->io->writeln('Bye');
             return null;
@@ -127,14 +148,20 @@ class UserListCommand extends Command
         }
         if ($page < 1) {
             $this->io->warning("Page must be higher or equal to 1");
-            return $this->getPage($currentPage, $totalPages);
+            return $this->getPage($this->askPage());
         }
 
-        if ($page > $totalPages) {
-            $this->io->warning("Page must be lower or equal to $totalPages");
-            return $this->getPage($currentPage, $totalPages);
+        if ($page > $this->totalPages) {
+            $this->io->warning("Page must be lower or equal to $this->totalPages");
+            return $this->getPage($this->askPage());
         }
 
+        $this->currentPage = $page;
         return $page;
+    }
+
+    private function askPage(): string
+    {
+        return $this->io->ask('page', ($this->currentPage < $this->totalPages) ? $this->currentPage + 1 : 'q');
     }
 }

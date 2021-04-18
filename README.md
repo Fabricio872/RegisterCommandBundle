@@ -2,6 +2,7 @@
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/Fabricio872/RegisterCommand)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fabricio872/RegisterCommand)
 [![Build Status](https://travis-ci.org/Fabricio872/RegisterCommand.svg?branch=main)](https://travis-ci.org/Fabricio872/RegisterCommand)
+![Packagist Downloads](https://img.shields.io/packagist/dt/Fabricio872/register-command)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Fabricio872/RegisterCommand?style=social)
 
 Installation
@@ -47,7 +48,7 @@ return [
 ```
 
 # Usage
-If your user entity is not `App\Entity\User` set it in services.yaml as:
+Configuration example:
 ```yaml
 # config/services.yaml
 
@@ -57,6 +58,13 @@ RegisterBundle:
 
     # Entity for your user
     user_class:           App\Entity\User
+
+    # Sets default value for maximum rows on single page of list table
+    table_limit:          10
+
+    # Sets maximum width for single column in characters
+    max_col_width:        64
+# ...
 ```
 
 ## Configure Entity
@@ -164,4 +172,33 @@ $ bin/console user:register
 To list all existing users execute this:
 ```console
 $ bin/console user:list
+```
+
+To jump to exact page execute this:
+```console
+$ bin/console user:list {page_number}
+```
+example for page 2:
+```console
+$ bin/console user:list 2
+```
+To change maximum rows in table use option -l or --limit:
+
+```console
+$ bin/console user:list -l {table_limit}
+```
+example for showing maximum 5 rows:
+
+```console
+$ bin/console user:list -l 5
+```
+To change maximum width of each column use option -w or --col-width:
+
+```console
+$ bin/console user:list -l {table_limit}
+```
+example for col width 32 characters:
+
+```console
+$ bin/console user:list -l 32
 ```
