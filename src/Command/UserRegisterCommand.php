@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserRegisterCommand extends Command
 {
@@ -28,6 +29,10 @@ class UserRegisterCommand extends Command
     private $io;
     /** @var EntityManagerInterface $em */
     private $em;
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
 
     /**
      * UserRegisterCommand constructor.
@@ -40,13 +45,16 @@ class UserRegisterCommand extends Command
         string $userClassName,
         UserPasswordEncoderInterface $passwordEncoder,
         Reader $reader,
-        EntityManagerInterface $em)
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
+    )
     {
         $this->userClassName = $userClassName;
         parent::__construct();
         $this->passwordEncoder = $passwordEncoder;
         $this->reader = $reader;
         $this->em = $em;
+        $this->validator = $validator;
     }
 
     protected function configure()
@@ -77,7 +85,8 @@ class UserRegisterCommand extends Command
             $this->userClassName,
             $this->reader,
             $this->io,
-            $this->passwordEncoder
+            $this->passwordEncoder,
+            $this->validator
         );
         foreach ($userClassReflection->getProperties() as $property) {
             $data[$property->getName()] = $ask->ask($property->getName());

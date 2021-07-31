@@ -11,11 +11,15 @@
     ],
     "require": {
         "php": "^7.2|^8.0",
+        "doctrine/annotations": "^1.13",
+        "doctrine/orm": "^2.9",
         "symfony/config": "^4.4|^5",
+        "symfony/console": "^5.3",
         "symfony/dependency-injection": "^4.4|^5",
         "symfony/http-kernel": "^4.4|^5",
         "symfony/security-bundle": "^4.4|^5",
-        "symfony/serializer": "^4.4|^5"
+        "symfony/serializer": "^4.4|^5",
+        "symfony/validator": "^5.3"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^4.4|^5"

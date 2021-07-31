@@ -8,6 +8,12 @@ use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\AbstractComparison;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Ask
 {
@@ -21,18 +27,24 @@ class Ask
     private $passwordEncoder;
     /** @var string $userIdentifier */
     private $userIdentifier = ' ';
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
 
     public function __construct(
         string $userClassName,
         Reader $reader,
         SymfonyStyle $io,
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordEncoderInterface $passwordEncoder,
+        ValidatorInterface $validator
     )
     {
         $this->userClassName = $userClassName;
         $this->reader = $reader;
         $this->io = $io;
         $this->passwordEncoder = $passwordEncoder;
+        $this->validator = $validator;
     }
 
     /**
@@ -51,6 +63,7 @@ class Ask
     public function ask(string $propertyName)
     {
         $userReflection = new \ReflectionClass($this->userClassName);
+//        dump($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class));
         /** @var ?RegisterCommand $annotation */
         $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), RegisterCommand::class);
 
@@ -69,6 +82,13 @@ class Ask
         }
 
         $answer = $question->getAnswer();
+        if ($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) {
+            /** @var ConstraintViolation $violation */
+            foreach ($this->validator->validate($answer, $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) as $violation) {
+                $this->io->error($violation->getMessage());
+                $answer = $question->getAnswer();
+            }
+        }
 
         if ($annotation->userIdentifier) {
             $this->userIdentifier = ' ' . $answer . ' ';
