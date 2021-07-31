@@ -9,17 +9,20 @@ namespace Fabricio872\RegisterCommand\Annotations;
 class RegisterCommand
 {
     /**
+     * Type of field you want to use
      * @Enum({"string", "hidden", "hiddenRepeat", "password", "array", "dateTime"})
      * @var string
      */
     public $field;
 
     /**
+     * Question that has to be asked user
      * @var string
      */
     public $question;
 
     /**
+     * Set field that should be used in success message after user is created
      * @var bool
      */
     public $userIdentifier = false;
