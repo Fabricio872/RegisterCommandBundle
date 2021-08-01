@@ -46,6 +46,9 @@ class UserEntityNormalizer implements NormalizerInterface
         if (is_string($property)) {
             return $property;
         }
+        if (is_bool($property)) {
+            return $property ? 'Yes' : 'No';
+        }
         if ($property instanceof \DateTime) {
             return $property->format('c');
         }

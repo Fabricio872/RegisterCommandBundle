@@ -63,7 +63,6 @@ class Ask
     public function ask(string $propertyName)
     {
         $userReflection = new \ReflectionClass($this->userClassName);
-//        dump($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class));
         /** @var ?RegisterCommand $annotation */
         $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), RegisterCommand::class);
 
@@ -85,7 +84,7 @@ class Ask
         if ($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) {
             /** @var ConstraintViolation $violation */
             foreach ($this->validator->validate($answer, $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) as $violation) {
-                $this->io->error($violation->getMessage());
+                $this->io->warning($violation->getMessage());
                 $answer = $question->getAnswer();
             }
         }
@@ -134,6 +133,8 @@ class Ask
     private function processValue($value, string $annotation)
     {
         switch ($annotation) {
+            case 'valueBoolean':
+                return (bool)$value;
             case 'valueString':
                 return (string)$value;
             case 'valuePassword':

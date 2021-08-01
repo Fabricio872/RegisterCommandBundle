@@ -43,16 +43,20 @@ class UserListCommand extends Command
     /**
      * @var int
      */
-    private $totalPages;
+    private $totalUsers;
+    /**
+     * @var int
+     */
+    private $limitUsers;
     /**
      * @var int
      */
     private $currentPage = 0;
 
     public function __construct(
-        string $userClassName,
-        int $tableLimit,
-        int $maxColWidth,
+        string                 $userClassName,
+        int                    $tableLimit,
+        int                    $maxColWidth,
         EntityManagerInterface $em
     )
     {
@@ -78,9 +82,14 @@ class UserListCommand extends Command
         /** @var int $colWidth */
         $this->colWidth = $input->getOption('col-width');
 
-        $this->totalPages = $this->em
+        $this->totalUsers = $this->em
             ->getRepository($this->userClassName)
             ->count([]);
+
+        if ($this->totalUsers == 0) {
+            $this->io->warning("Table is empty");
+            return 0;
+        }
 
         $userClass = new $this->userClassName();
         if (!$userClass instanceof UserInterface) {
@@ -92,22 +101,16 @@ class UserListCommand extends Command
         if ($page === null) {
             return 0;
         }
-        /** @var int $limit */
-        $limit = $input->getOption('limit');
+        $this->limitUsers = $input->getOption('limit');
 
-        return $this->draw($page, $limit);
+        return $this->draw($page);
     }
 
-    private function draw(int $page, int $limit)
+    private function draw(int $page)
     {
         $userList = $this->em
             ->getRepository($this->userClassName)
-            ->findBy([], [], $limit, $limit * ($page - 1));
-
-        if ($this->totalPages == 0) {
-            $this->io->warning("Table is empty");
-            return 0;
-        }
+            ->findBy([], [], $this->limitUsers, $this->limitUsers * ($page - 1));
 
         $objectToTable = new ObjectToTable(
             $userList,
@@ -115,7 +118,7 @@ class UserListCommand extends Command
         );
 
         $table = $objectToTable->makeTable();
-        $table->setFooterTitle("Page $page / " . ceil($this->totalPages / $limit));
+        $table->setFooterTitle("Page $page / " . ceil($this->totalUsers / $this->limitUsers));
 
         for ($i = 0; $i < count($objectToTable->getUserGetters(new $this->userClassName)); $i++) {
             $table->setColumnMaxWidth($i, $this->colWidth);
@@ -123,7 +126,7 @@ class UserListCommand extends Command
 
         $table->render();
 
-        if (ceil($this->totalPages / $limit) > 1) {
+        if (ceil($this->totalUsers / $this->limitUsers) > 1) {
             $this->io->writeln('To exit type "q" and pres <return>');
             $page = $this->getPage($this->askPage());
 
@@ -131,7 +134,7 @@ class UserListCommand extends Command
                 return 0;
             }
 
-            $this->draw($page, $limit);
+            $this->draw($page);
         }
         return 0;
     }
@@ -147,12 +150,12 @@ class UserListCommand extends Command
             return null;
         }
         if ($page < 1) {
-            $this->io->warning("Page must be higher or equal to 1");
+            $this->io->warning("Pages must be higher or equal to 1");
             return $this->getPage($this->askPage());
         }
 
-        if ($page > $this->totalPages) {
-            $this->io->warning("Page must be lower or equal to $this->totalPages");
+        if ($page > $this->totalUsers) {
+            $this->io->warning("Page must be lower or equal to $this->totalUsers");
             return $this->getPage($this->askPage());
         }
 
@@ -162,6 +165,6 @@ class UserListCommand extends Command
 
     private function askPage(): string
     {
-        return $this->io->ask('page', ($this->currentPage < $this->totalPages) ? $this->currentPage + 1 : 'q');
+        return $this->io->ask('page', ($this->currentPage < ceil($this->totalUsers / $this->limitUsers)) ? $this->currentPage + 1 : 'q');
     }
 }

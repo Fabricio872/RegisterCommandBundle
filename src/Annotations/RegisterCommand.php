@@ -10,7 +10,7 @@ class RegisterCommand
 {
     /**
      * Type of field you want to use
-     * @Enum({"string", "hidden", "hiddenRepeat", "password", "array", "dateTime"})
+     * @Enum({"string", "hidden", "hiddenRepeat", "password", "array", "dateTime", "date", "yesNo"})
      * @var string
      */
     public $field;
@@ -28,11 +28,17 @@ class RegisterCommand
     public $userIdentifier = false;
 
     /**
+     * @var bool
+     */
+    public $valueBoolean;
+
+    /**
      * @var string
      */
     public $valueString;
 
     /**
+     * This value gets encrypted by current password encryptor
      * @var string
      */
     public $valuePassword;
