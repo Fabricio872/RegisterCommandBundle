@@ -69,12 +69,11 @@ RegisterBundle:
 
 ## Configure Entity
 
+### Configuration with Inputs 
 To field to be asked from terminal you have to set fields to one of those input types:
-"string", "hidden", "hiddenRepeat", "password", "array", "dateTime"
+"string", "hidden", "hiddenRepeat", "password", "array", "dateTime", "date", "yesNo'
 
-> note: "password" is same s "hiddenRepeat", but it gets encrypted
-
-Example with string value:
+#### Example with string value:
 
 ```php
 // src/Entity/User.php
@@ -90,29 +89,38 @@ Example with string value:
 // ...
 ```
 
-> note: "userIdentifier" is not required and has to be set to only one field and value from that field will be used as success message to identify who was registered 
+> note: "userIdentifier" is not required and has to be set to only one field and value from that field will be used in a success message to identify who was registered 
 
-To field to be populated automatically with some default value you can use one of these inputs:
-"valueString", "valuePassword", "valueArray", "valueInt", "valueFloat", "valueDateTime"
-
-> note: "valuePassword" is same as "valueString" but encrypted
-
-Example for "valueArray":
+#### Example with hidden value:
 
 ```php
 // src/Entity/User.php
 // ...
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="string", length=180, unique=true)
      * @RegisterCommand(
-     *     valueArray={"ROLE_USER"}
+     *     field="hidden"
      * )
      */
-    private $roles = [];
+    private $hiddenValue;
+// ...
+```
+#### Example with hidden repeated value:
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @RegisterCommand(
+     *     field="hiddenRepeated"
+     * )
+     */
+    private $hiddenRepeatedValue;
 // ...
 ```
 
-Example for "valuePassword":
+#### Example for password value:
 
 ```php
 // src/Entity/User.php
@@ -121,14 +129,81 @@ Example for "valuePassword":
      * @var string The hashed password
      * @ORM\Column(type="string")
      * @RegisterCommand(
-     *     valuePassword="defaultPassword"
+     *     field="password"
      * )
      */
     private $password;
 // ...
 ```
+> note: "password" is same as "hiddenRepeat", but it gets encrypted by configured password encryption method
 
-To customize asked question you can use parameter "question"
+#### Example for array value:
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="json")
+     * @RegisterCommand(
+     *     field="array"
+     * )
+     */
+    private $roles = [];
+// ...
+```
+
+#### Example for datetime value:
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="datetime")
+     * @RegisterCommand(
+     *     field="datetime"
+     * )
+     */
+    private $datetime;
+// ...
+```
+
+#### Example for date value:
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="datetime")
+     * @RegisterCommand(
+     *     field="date"
+     * )
+     */
+    private $date;
+// ...
+```
+
+#### Example for yesNo value:
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="boolean")
+     * @RegisterCommand(
+     *     field="yesNo"
+     * )
+     */
+    private $date;
+// ...
+```
+
+#### Additional options:
+
+> To each defined field you can make customized question with "question" parameter
+
+> To one defined field you can add "userIdentifier" to define value which will be used in a success message to identify who was registered
+
+> For validating each value you can define Assert function ([more detailed documentation](https://symfony.com/doc/current/validation.html))
 
 Example:
 ```php
@@ -136,6 +211,7 @@ Example:
 //...
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\Email()
      * @RegisterCommand(
      *     field="string",
      *     userIdentifier=true,
@@ -147,7 +223,102 @@ Example:
 
 ```
 
-For "valueDateTime" you can specify same value as for DateTime PHP funcition
+### Configuration with pre-defined values
+
+If you want to define default value instead of asking for one you can use these settings   
+
+#### Example for boolean value
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="boolean")
+     * @RegisterCommand(
+     *      valueBoolean=true
+     * )
+     */
+    private $boolean;
+// ...
+```
+
+#### Example for string value
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @RegisterCommand(
+     *      valueString="some string"
+     * )
+     */
+    private $string;
+// ...
+```
+
+#### Example for password value
+
+> This value gets automatically encrypted by current password encryption method
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @RegisterCommand(
+     *      valuePassword="P4$$w0rd"
+     * )
+     */
+    private $password;
+// ...
+```
+
+#### Example for array value
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="json")
+     * @RegisterCommand(
+     *      valueArray={"ROLE_ADMIN"}
+     * )
+     */
+    private $roles;
+// ...
+```
+
+#### Example for int value
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="integer")
+     * @RegisterCommand(
+     *      valueInt=420
+     * )
+     */
+    private $integer;
+// ...
+```
+
+#### Example for float value
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="float")
+     * @RegisterCommand(
+     *      valueFloat=420.69
+     * )
+     */
+    private $float;
+// ...
+```
+
+#### Example for datetime value with current time
 
 ```php
 // src/Entity/User.php
@@ -158,11 +329,28 @@ For "valueDateTime" you can specify same value as for DateTime PHP funcition
      *      valueDateTime="now"
      * )
      */
+    private $roles;
+// ...
+```
+
+> For "valueDateTime" you can specify same value as for DateTime PHP funcition
+
+#### Example for datetime value with defined value
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @ORM\Column(type="datetime")
+     * @RegisterCommand(
+     *      valueDateTime="2020-04-20T16:20:00.69Z"
+     * )
+     */
     private $date;
 // ...
 ```
 
-Finally, you are ready to register some users.
+## Finally, you are ready to register some users.
 
 Execute this command:
 ```console
