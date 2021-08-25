@@ -38,8 +38,7 @@ class Ask
         SymfonyStyle $io,
         UserPasswordEncoderInterface $passwordEncoder,
         ValidatorInterface $validator
-    )
-    {
+    ) {
         $this->userClassName = $userClassName;
         $this->reader = $reader;
         $this->io = $io;
@@ -138,7 +137,7 @@ class Ask
             case 'valueString':
                 return (string)$value;
             case 'valuePassword':
-                return (string)$this->passwordEncoder->encodePassword(new $this->userClassName, $value);
+                return (string)$this->passwordEncoder->encodePassword(new $this->userClassName(), $value);
             case 'valueArray':
                 return (array)$value;
             case 'valueInt':

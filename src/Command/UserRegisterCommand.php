@@ -47,8 +47,7 @@ class UserRegisterCommand extends Command
         Reader $reader,
         EntityManagerInterface $em,
         ValidatorInterface $validator
-    )
-    {
+    ) {
         $this->userClassName = $userClassName;
         parent::__construct();
         $this->passwordEncoder = $passwordEncoder;

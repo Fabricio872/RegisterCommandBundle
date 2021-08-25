@@ -22,8 +22,7 @@ class ObjectToTable
     public function __construct(
         iterable $users,
         OutputInterface $output
-    )
-    {
+    ) {
         $this->users = $users;
         $this->output = $output;
     }

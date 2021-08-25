@@ -22,7 +22,8 @@
         "symfony/validator": "^4.4|^5"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^4.4|^5"
+        "symfony/phpunit-bridge": "^4.4|^5",
+        "symplify/easy-coding-standard": "^9.4"
     },
     "config": {
         "optimize-autoloader": true,

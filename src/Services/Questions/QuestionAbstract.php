@@ -25,8 +25,8 @@ abstract class QuestionAbstract implements QuestionInterface
         SymfonyStyle $io,
         string $question,
         UserPasswordEncoderInterface $passwordEncoder,
-        $user)
-    {
+        $user
+    ) {
         $this->io = $io;
         $this->question = $question;
         $this->passwordEncoder = $passwordEncoder;

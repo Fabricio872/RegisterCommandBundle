@@ -58,8 +58,7 @@ class UserListCommand extends Command
         int                    $tableLimit,
         int                    $maxColWidth,
         EntityManagerInterface $em
-    )
-    {
+    ) {
         $this->userClassName = $userClassName;
         $this->tableLimit = $tableLimit;
         $this->maxColWidth = $maxColWidth;
@@ -120,7 +119,7 @@ class UserListCommand extends Command
         $table = $objectToTable->makeTable();
         $table->setFooterTitle("Page $page / " . ceil($this->totalUsers / $this->limitUsers));
 
-        for ($i = 0; $i < count($objectToTable->getUserGetters(new $this->userClassName)); $i++) {
+        for ($i = 0; $i < count($objectToTable->getUserGetters(new $this->userClassName())); $i++) {
             $table->setColumnMaxWidth($i, $this->colWidth);
         }
 
