@@ -41,5 +41,8 @@
         "psr-4": {
             "Fabricio872\\RegisterCommand\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test-psr": "vendor/bin/ecs check src"
     }
 }
