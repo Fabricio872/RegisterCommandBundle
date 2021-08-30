@@ -1,4 +1,5 @@
 <?php
+
 namespace Fabricio872\RegisterCommand\Helpers;
 
 use Symfony\Component\Console\Input\StreamableInputInterface;
@@ -15,7 +16,7 @@ trait StreamableInput
      */
     protected function getInputStream()
     {
-        if (!$this->input instanceof StreamableInputInterface){
+        if (!$this->input instanceof StreamableInputInterface) {
             throw new \Exception('Streamable interface not found');
         }
 

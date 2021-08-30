@@ -46,7 +46,8 @@ abstract class QuestionAbstract implements QuestionInterface
         $this->output = $output;
     }
 
-    protected function writeQuestion(){
+    protected function writeQuestion()
+    {
         $this->io->writeln($this->question);
     }
 }

@@ -42,8 +42,7 @@ class Ask
         OutputInterface              $output,
         UserPasswordEncoderInterface $passwordEncoder,
         ValidatorInterface           $validator
-    )
-    {
+    ) {
         $this->userClassName = $userClassName;
         $this->reader = $reader;
         $this->io = $io;
@@ -171,7 +170,8 @@ class Ask
         /** @var ConstraintViolation $violation */
         foreach (
             $this->validator->validate(
-                $answer, array_filter(
+                $answer,
+                array_filter(
                     array_map(
                         function ($annotation) {
                             if ($annotation instanceof Constraint) {

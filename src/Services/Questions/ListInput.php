@@ -39,7 +39,6 @@ class ListInput extends QuestionAbstract
         $this->table();
 
         while (!feof($this->stream) && ($char = fread($this->stream, 1)) != "\n") {
-
             if (" " === $char) {
                 if (in_array($this->options[$this->cursor], $this->activeList)) {
                     unset($this->activeList[array_search($this->options[$this->cursor], $this->activeList)]);
