@@ -1,4 +1,4 @@
-name: PHP Composer Test and tag
+name: PHP Composer Test and Tag
 
 on:
   pull_request:
@@ -10,7 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
@@ -30,11 +33,30 @@ jobs:
     - name: Run psr-12 test
       run: composer run-script test-psr
 
-    - name: Changelog
-      uses: scottbrenner/generate-changelog-action@master
-      id: Changelog
-      env:
-        REPO: ${{ github.repository }}
+    - uses: paulhatch/semantic-version@v4.0.2
+      id: version
+      with:
+        # The prefix to use to identify tags
+        tag_prefix: "v"
+        # A string which, if present in a git commit, indicates that a change represents a
+        # major (breaking) change, supports regular expressions wrapped with '/'
+        major_pattern: "(MAJOR)"
+        # Same as above except indicating a minor change, supports regular expressions wrapped with '/'
+        minor_pattern: "(MINOR)"
+        # A string to determine the format of the version output
+        format: "${major}.${minor}.${patch}-prerelease${increment}"
+        # Optional path to check for changes. If any changes are detected in the path the
+        # 'changed' output will true. Enter multiple paths separated by spaces.
+        change_path: "src"
+        # Indicate whether short tags like 'v1' should be supported. If false only full
+        # tags like 'v1.0.0' will be recognized.
+        short_tags: true
+        # If this is set to true, *every* commit will be treated as a new version.
+        bump_each_commit: false
+
+    - run: echo "${{ steps.version.outputs.increment }}"
+    - run: echo "${{ steps.version.outputs.version }}"
+    - run: echo "${{ steps.version.outputs.version_tag }}"
 
     - name: Create Release
       id: create_release
@@ -42,9 +64,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          ${{ steps.Changelog.outputs.changelog }}
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: Release ${{ steps.version.outputs.version }}
         draft: false
         prerelease: false
