@@ -10,7 +10,7 @@ class RegisterCommand
 {
     /**
      * Type of field you want to use
-     * @Enum({"string", "hidden", "hiddenRepeat", "password", "array", "dateTime", "date", "yesNo"})
+     * @Enum({"string", "hidden", "hiddenRepeat", "password", "array", "list", "dateTime", "date", "yesNo"})
      * @var string
      */
     public $field;
@@ -20,6 +20,12 @@ class RegisterCommand
      * @var string
      */
     public $question;
+
+    /**
+     * Question that has to be asked user
+     * @var mixed
+     */
+    public $options;
 
     /**
      * Set field that should be used in success message after user is created

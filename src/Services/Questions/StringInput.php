@@ -2,9 +2,9 @@
 
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
-class InputString extends QuestionAbstract
+class StringInput extends QuestionAbstract
 {
-    public function getAnswer()
+    public function getAnswer(): ?string
     {
         return $this->io->ask($this->question);
     }

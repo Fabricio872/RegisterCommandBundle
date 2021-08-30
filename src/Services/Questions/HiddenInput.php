@@ -4,9 +4,9 @@ namespace Fabricio872\RegisterCommand\Services\Questions;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class InputHidden extends QuestionAbstract
+class HiddenInput extends QuestionAbstract
 {
-    public function getAnswer()
+    public function getAnswer(): ?string
     {
         return $this->io->askHidden($this->question);
     }

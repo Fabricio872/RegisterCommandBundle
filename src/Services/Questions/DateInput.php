@@ -2,21 +2,16 @@
 
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
-class InputDateTime extends QuestionAbstract
+class DateInput extends QuestionAbstract
 {
-    private $values = [];
-
-    public function getAnswer()
+    public function getAnswer(): \DateTime
     {
-        $this->io->writeln($this->question);
+        $this->io->writeln("<info> $this->question</info>:");
         $day = $this->ask('Day (1-31)', [1, 31]);
         $month = $this->ask('Month (1-12)', [1, 12]);
         $year = $this->ask('Year (1900-9999)', [1900, 9999]);
-        $hour = $this->ask('Hour (0-23)', [0, 23]);
-        $minute = $this->ask('Minute (0-59)', [0, 59]);
-        $second = $this->ask('Second (0.0-59.9)', [0.0 - 59.9]);
 
-        return new \DateTime("$year-$month-$day" . "T$hour:$minute:$second" . "Z");
+        return new \DateTime("$year-$month-$day");
     }
 
     private function ask(string $question, array $range)

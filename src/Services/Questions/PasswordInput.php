@@ -2,11 +2,11 @@
 
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
-class InputHiddenRepeat extends QuestionAbstract
+class PasswordInput extends QuestionAbstract
 {
-    public function getAnswer(): string
+    public function getAnswer(): ?string
     {
-        return $this->validated();
+        return is_null($password = $this->validated()) ? null : $this->passwordEncoder->encodePassword($this->user, $password);
     }
 
     private function validated(): ?string
