@@ -2,16 +2,16 @@
 
 namespace Fabricio872\RegisterCommand\Services;
 
+use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Reader;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\AbstractComparison;
-use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -23,25 +23,31 @@ class Ask
     private $reader;
     /** @var SymfonyStyle $io */
     private $io;
+    /** @var InputInterface */
+    private $input;
+    /** @var OutputInterface */
+    private $output;
     /** @var UserPasswordEncoderInterface $passwordEncoder */
     private $passwordEncoder;
     /** @var string $userIdentifier */
     private $userIdentifier = ' ';
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     private $validator;
 
     public function __construct(
-        string $userClassName,
-        Reader $reader,
-        SymfonyStyle $io,
+        string                       $userClassName,
+        Reader                       $reader,
+        SymfonyStyle                 $io,
+        InputInterface               $input,
+        OutputInterface              $output,
         UserPasswordEncoderInterface $passwordEncoder,
-        ValidatorInterface $validator
+        ValidatorInterface           $validator
     ) {
         $this->userClassName = $userClassName;
         $this->reader = $reader;
         $this->io = $io;
+        $this->input = $input;
+        $this->output = $output;
         $this->passwordEncoder = $passwordEncoder;
         $this->validator = $validator;
     }
@@ -79,13 +85,10 @@ class Ask
             throw new \Exception('Input class: ' . get_class($question) . ' must implement ' . QuestionInterface::class);
         }
 
-        $answer = $question->getAnswer();
         if ($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) {
-            /** @var ConstraintViolation $violation */
-            foreach ($this->validator->validate($answer, $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) as $violation) {
-                $this->io->warning($violation->getMessage());
-                $answer = $question->getAnswer();
-            }
+            $answer = $this->validate($question, $userReflection, $propertyName);
+        } else {
+            $answer = $question->getAnswer();
         }
 
         if ($annotation->userIdentifier) {
@@ -98,17 +101,20 @@ class Ask
     /**
      * @param RegisterCommand $annotation
      * @param string $propertyName
-     * @return QuestionInterface
+     * @return ?QuestionInterface
      */
-    private function makeQuestion(RegisterCommand $annotation, string $propertyName): QuestionInterface
+    private function makeQuestion(RegisterCommand $annotation, string $propertyName): ?QuestionInterface
     {
-        $questionName = 'Fabricio872\RegisterCommand\Services\Questions\Input' . ucfirst($annotation->field ?? 'string');
+        $questionName = 'Fabricio872\RegisterCommand\Services\Questions\\' . ucfirst($annotation->field) . 'Input';
 
         return new $questionName(
             $this->io,
+            $this->input,
+            $this->output,
             $annotation->question ?? 'Set ' . $annotation->field . ' for field ' . $propertyName,
             $this->passwordEncoder,
-            new $this->userClassName()
+            new $this->userClassName(),
+            $annotation->options
         );
     }
 
@@ -129,6 +135,12 @@ class Ask
         return null;
     }
 
+    /**
+     * @param $value
+     * @param string $annotation
+     * @return array|bool|\DateTime|float|int|string
+     * @throws \Exception
+     */
     private function processValue($value, string $annotation)
     {
         switch ($annotation) {
@@ -149,5 +161,36 @@ class Ask
             default:
                 throw new \Exception("Unsupported value type: " . $annotation);
         }
+    }
+
+    private function validate(QuestionInterface $question, \ReflectionClass $userReflection, string $propertyName)
+    {
+        $answer = $question->getAnswer();
+
+        /** @var ConstraintViolation $violation */
+        foreach (
+            $this->validator->validate(
+                $answer,
+                array_filter(
+                    array_map(
+                        function ($annotation) {
+                            if ($annotation instanceof Constraint) {
+                                return $annotation;
+                            }
+                        },
+                        $this->reader->getPropertyAnnotations(
+                            $userReflection->getProperty($propertyName)
+                        )
+                    )
+                )
+            )
+            as $violation) {
+            $this->io->warning($violation->getMessage());
+        }
+
+        if (isset($violation)) {
+            return $this->validate($question, $userReflection, $propertyName);
+        }
+        return $answer;
     }
 }

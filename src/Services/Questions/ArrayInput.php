@@ -2,13 +2,13 @@
 
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
-class InputArray extends QuestionAbstract
+class ArrayInput extends QuestionAbstract
 {
     private $values = [];
 
-    public function getAnswer()
+    public function getAnswer(): array
     {
-        $this->io->writeln($this->question);
+        $this->io->writeln("<info> $this->question</info>:");
         $this->ask();
         return $this->values;
     }

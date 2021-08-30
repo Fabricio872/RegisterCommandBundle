@@ -29,9 +29,7 @@ class UserRegisterCommand extends Command
     private $io;
     /** @var EntityManagerInterface $em */
     private $em;
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     private $validator;
 
     /**
@@ -84,6 +82,8 @@ class UserRegisterCommand extends Command
             $this->userClassName,
             $this->reader,
             $this->io,
+            $input,
+            $output,
             $this->passwordEncoder,
             $this->validator
         );
