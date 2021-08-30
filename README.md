@@ -1,7 +1,7 @@
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/Fabricio872/RegisterCommand)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fabricio872/RegisterCommand)
-[![PHP Composer](https://github.com/Fabricio872/RegisterCommandBundle/actions/workflows/php.yml/badge.svg)](https://github.com/Fabricio872/RegisterCommandBundle/actions/workflows/php.yml)
+[![PHP Composer Test and Tag](https://github.com/Fabricio872/RegisterCommandBundle/actions/workflows/php-composer.yml/badge.svg)](https://github.com/Fabricio872/RegisterCommandBundle/actions/workflows/php-composer.yml)
 ![Packagist Downloads](https://img.shields.io/packagist/dt/Fabricio872/register-command)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Fabricio872/RegisterCommand?style=social)
 
