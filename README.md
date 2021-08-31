@@ -152,6 +152,23 @@ To field to be asked from terminal you have to set fields to one of those input 
 // ...
 ```
 
+#### Example for list value:
+
+```php
+// src/Entity/User.php
+// ...
+    /**
+     * @RegisterCommand(
+     *     options={"ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN"},
+     *     field="list"
+     * )
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+// ...
+```
+> this uses additional parameter "options" where you can specify multiple available options from which you can pick one or more at registering process
+
 #### Example for datetime value:
 
 ```php
