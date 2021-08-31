@@ -383,6 +383,7 @@ To jump to exact page execute this:
 ```console
 $ bin/console user:list {page_number}
 ```
+
 example for page 2:
 ```console
 $ bin/console user:list 2
@@ -400,10 +401,10 @@ $ bin/console user:list -l 5
 To change maximum width of each column use option -w or --col-width:
 
 ```console
-$ bin/console user:list -l {table_limit}
+$ bin/console user:list -w {table_limit}
 ```
 example for col width 32 characters:
 
 ```console
-$ bin/console user:list -l 32
+$ bin/console user:list -w 32
 ```
