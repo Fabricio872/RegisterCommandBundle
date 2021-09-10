@@ -2,14 +2,18 @@
 
 namespace Fabricio872\RegisterCommand\Command;
 
+use Fabricio872\RegisterCommand\Serializer\UserEntityNormalizer;
 use Fabricio872\RegisterCommand\Services\ArrayToTable;
 use Fabricio872\RegisterCommand\Services\UserEditor;
 use Fabricio872\RegisterCommand\Services\UserEditorInterface;
+use Symfony\Component\Serializer\Serializer;
 
 class UserListCommand extends AbstractList
 {
     protected static $defaultName = 'user:list';
     protected static $defaultDescription = 'List all existing users';
+    /** @var array|object[] */
+    private $userList;
 
     protected function configure()
     {
@@ -27,12 +31,12 @@ class UserListCommand extends AbstractList
             /** @var int $page */
             $page = $this->getPage($this->input->getArgument('page'));
         }
-        $userList = $this->em
+        $this->userList = $this->em
             ->getRepository($this->userClassName)
             ->findBy([], [], $this->limitUsers, $this->limitUsers * ($page - 1));
 
         $userArray = [];
-        foreach ($userList as $user) {
+        foreach ($this->userList as $user) {
             $userArray[] = $this->normalizer->normalize($user);
         }
         $objectToTable = new ArrayToTable(
@@ -75,7 +79,14 @@ class UserListCommand extends AbstractList
         }
         if (strtolower($page) == 'e') {
             /** @var UserEditorInterface $userEditor */
-            $userEditor = new UserEditor($this->input, $this->output);
+            $userEditor = new UserEditor(
+                $this->input,
+                $this->output,
+                $this->em,
+                $this->userList,
+                $this->normalizer,
+                $this->colWidth
+            );
             $userEditor->drawEdiTable();
             return $this->getPage($this->askPage());
         }
@@ -95,5 +106,15 @@ class UserListCommand extends AbstractList
 
         $this->currentPage = $page;
         return $page;
+    }
+
+    /**
+     * @return Serializer
+     */
+    private function getSerializer(): Serializer
+    {
+        $normalizers = [new UserEntityNormalizer()];
+
+        return new Serializer($normalizers);
     }
 }
