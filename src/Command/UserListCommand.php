@@ -2,11 +2,10 @@
 
 namespace Fabricio872\RegisterCommand\Command;
 
-use Fabricio872\RegisterCommand\Serializer\UserEntityNormalizer;
 use Fabricio872\RegisterCommand\Services\ArrayToTable;
+use Fabricio872\RegisterCommand\Services\Ask;
 use Fabricio872\RegisterCommand\Services\UserEditor;
 use Fabricio872\RegisterCommand\Services\UserEditorInterface;
-use Symfony\Component\Serializer\Serializer;
 
 class UserListCommand extends AbstractList
 {
@@ -85,7 +84,8 @@ class UserListCommand extends AbstractList
                 $this->em,
                 $this->userList,
                 $this->normalizer,
-                $this->colWidth
+                $this->colWidth,
+                $this->buildAsk()
             );
             $userEditor->drawEdiTable();
             return $this->getPage($this->askPage());
@@ -108,13 +108,16 @@ class UserListCommand extends AbstractList
         return $page;
     }
 
-    /**
-     * @return Serializer
-     */
-    private function getSerializer(): Serializer
+    private function buildAsk(): Ask
     {
-        $normalizers = [new UserEntityNormalizer()];
-
-        return new Serializer($normalizers);
+        return new Ask(
+            $this->userClassName,
+            $this->reader,
+            $this->io,
+            $this->input,
+            $this->output,
+            $this->passwordEncoder,
+            $this->validator
+        );
     }
 }

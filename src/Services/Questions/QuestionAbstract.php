@@ -29,21 +29,22 @@ abstract class QuestionAbstract implements QuestionInterface
      * @param UserPasswordEncoderInterface $passwordEncoder
      */
     public function __construct(
-        SymfonyStyle $io,
-        InputInterface $input,
-        OutputInterface $output,
-        string $question,
+        SymfonyStyle                 $io,
+        InputInterface               $input,
+        OutputInterface              $output,
+        string                       $question,
         UserPasswordEncoderInterface $passwordEncoder,
-        $user,
-        $options
-    ) {
+                                     $user,
+                                     $options
+    )
+    {
         $this->io = $io;
         $this->question = $question;
+        $this->input = $input;
+        $this->output = $output;
         $this->passwordEncoder = $passwordEncoder;
         $this->user = $user;
         $this->options = $options;
-        $this->input = $input;
-        $this->output = $output;
     }
 
     protected function writeQuestion()

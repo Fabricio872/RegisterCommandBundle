@@ -3,6 +3,7 @@
 namespace Fabricio872\RegisterCommand\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Helpers\StreamableInput;
 use Fabricio872\RegisterCommand\Serializer\UserEntityNormalizer;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,6 +35,8 @@ class UserEditor implements UserEditorInterface
     private $cursorEnd;
     /** @var int */
     private $tableLines;
+    /** @var Ask */
+    private $ask;
 
     public function __construct(
         InputInterface         $input,
@@ -41,7 +44,8 @@ class UserEditor implements UserEditorInterface
         EntityManagerInterface $em,
         array                  $userList,
         NormalizerInterface    $normalizer,
-        int                    $colWidth
+        int                    $colWidth,
+        Ask                    $ask
     )
     {
         $this->input = $input;
@@ -50,8 +54,12 @@ class UserEditor implements UserEditorInterface
         $this->userList = $userList;
         $this->normalizer = $normalizer;
         $this->colWidth = $colWidth;
+        $this->ask = $ask;
     }
 
+    /**
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
     public function drawEdiTable(): void
     {
         $this->stream = $this->getInputStream();
@@ -65,11 +73,7 @@ class UserEditor implements UserEditorInterface
 
         while (!feof($this->stream) && ($char = fread($this->stream, 1)) != "\n") {
             if (" " === $char) {
-//                if (in_array($this->options[$this->cursor], $this->activeList)) {
-//                    unset($this->activeList[array_search($this->options[$this->cursor], $this->activeList)]);
-//                } else {
-//                    $this->activeList[] = $this->options[$this->cursor];
-//                }
+                $this->updateValue();
                 $this->table();
             } elseif ("\033" === $char) {
                 $this->tryCellNavigation($char);
@@ -79,14 +83,13 @@ class UserEditor implements UserEditorInterface
         shell_exec(sprintf('stty %s', $this->sttyMode));
     }
 
+    /**
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
     private function table()
     {
         $bufferedOutput = new BufferedOutput();
         $io = new SymfonyStyle($this->input, $bufferedOutput);
-
-        if ($this->tableLines) {
-            $io->write(sprintf("\033[%dA", $this->tableLines));
-        }
 
         $userArray = [];
         $this->cursorEnd[0] = count($this->userList);
@@ -111,9 +114,7 @@ class UserEditor implements UserEditorInterface
         $io->writeln("Use arrows to navigate");
         $io->writeln("<spacebar> to enter editing mode");
         $io->writeln("<enter> to exit editing mode");
-        $tableRendered = $bufferedOutput->fetch();
-        $this->tableLines = substr_count($tableRendered, "\n");
-        $this->output->write($tableRendered);
+        $this->renderFrame($bufferedOutput->fetch());
     }
 
     private function tryCellNavigation($char): void
@@ -173,6 +174,16 @@ class UserEditor implements UserEditorInterface
         $this->table();
     }
 
+    private function renderFrame(string $frame)
+    {
+        if ($this->tableLines) {
+            $this->output->write(sprintf("\033[%dA", $this->tableLines));
+        }
+
+        $this->tableLines = substr_count($frame, "\n");
+        $this->output->write($frame);
+    }
+
     /**
      * @return Serializer
      */
@@ -181,5 +192,35 @@ class UserEditor implements UserEditorInterface
         $normalizers = [new UserEntityNormalizer()];
 
         return new Serializer($normalizers);
+    }
+
+    private function updateValue(): void
+    {
+        $io = new SymfonyStyle($this->input, $this->output);
+        $userReflection = new \ReflectionClass($this->ask->getUserClassName());
+        $user = $this->userList[$this->cursor[0]];
+        try {
+            $property = $userReflection->getProperty(array_keys($this->normalizer->normalize($user))[$this->cursor[1]]);
+            if (
+                $this->ask->getReader()->getPropertyAnnotation($property, RegisterCommand::class) &&
+                $this->ask->getReader()->getPropertyAnnotation($property, RegisterCommand::class)->field
+            ) {
+                $property->setAccessible(true);
+                $property->setValue($user, $this->ask->ask($property->getName()));
+
+                $this->em->persist($user);
+                $this->em->flush();
+            } else {
+                $io->warning("property " . $property->getName() . " cannot be modified");
+                $io->success("press any key to continue");
+                fread($this->stream, 1);
+            }
+        } catch (\Exception $e) {
+            $io->warning($e->getMessage());
+            $io->success("press any key to continue");
+            fread($this->stream, 1);
+        }
+
+        $this->tableLines = null;
     }
 }

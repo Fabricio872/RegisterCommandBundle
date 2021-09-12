@@ -2,6 +2,7 @@
 
 namespace Fabricio872\RegisterCommand\Command;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -9,8 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractList extends Command
 {
@@ -38,6 +41,12 @@ abstract class AbstractList extends Command
     protected $currentPage = 0;
     /** @var NormalizerInterface */
     protected $normalizer;
+    /** @var UserPasswordEncoderInterface */
+    protected $passwordEncoder;
+    /** @var Reader */
+    protected $reader;
+    /** @var ValidatorInterface */
+    protected $validator;
 
     /**
      * @param string $userClassName
@@ -46,17 +55,23 @@ abstract class AbstractList extends Command
      * @param EntityManagerInterface $em
      */
     public function __construct(
-        string                 $userClassName,
-        int                    $tableLimit,
-        int                    $maxColWidth,
-        EntityManagerInterface $em,
-        NormalizerInterface    $normalizer
+        string                       $userClassName,
+        int                          $tableLimit,
+        int                          $maxColWidth,
+        EntityManagerInterface       $em,
+        NormalizerInterface          $normalizer,
+        UserPasswordEncoderInterface $passwordEncoder,
+        Reader                       $reader,
+        ValidatorInterface           $validator
     ) {
         $this->userClassName = $userClassName;
         $this->tableLimit = $tableLimit;
         $this->maxColWidth = $maxColWidth;
         $this->em = $em;
         $this->normalizer = $normalizer;
+        $this->passwordEncoder = $passwordEncoder;
+        $this->reader = $reader;
+        $this->validator = $validator;
         parent::__construct();
     }
 

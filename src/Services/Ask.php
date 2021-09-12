@@ -2,7 +2,6 @@
 
 namespace Fabricio872\RegisterCommand\Services;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Reader;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
@@ -96,6 +95,22 @@ class Ask
         }
 
         return $answer;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserClassName(): string
+    {
+        return $this->userClassName;
+    }
+
+    /**
+     * @return Reader
+     */
+    public function getReader(): Reader
+    {
+        return $this->reader;
     }
 
     /**

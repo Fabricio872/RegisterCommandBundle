@@ -15,7 +15,8 @@ interface UserEditorInterface
         EntityManagerInterface $em,
         array                  $userList,
         NormalizerInterface    $normalizer,
-        int                    $colWidth
+        int                    $colWidth,
+        Ask                    $ask
     );
 
     public function drawEdiTable(): void;
