@@ -7,29 +7,16 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UserEntityNormalizer implements NormalizerInterface
 {
-    /**
-     * @var array
-     */
-    private $getters;
-
-    public function __construct(array $getters)
+    public function supportsNormalization($array, $format = null, array $context = [])
     {
-        $this->getters = $getters;
+        return is_array($array);
     }
 
-    public function supportsNormalization($object, $format = null, array $context = [])
+    public function normalize($objects, $format = null, array $context = [])
     {
-        return $object instanceof UserInterface;
-    }
-
-    public function normalize($object, $format = null, array $context = [])
-    {
-        $processedData = [];
-        foreach ($this->getters as $getter) {
-//            $this->reader->get
-            $processedData[] = $this->processProperty($object->$getter());
+        foreach ($objects as $object) {
+            yield $this->processProperty($object);
         }
-        return $processedData;
     }
 
     private function processProperty($property)

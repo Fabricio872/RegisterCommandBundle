@@ -379,6 +379,8 @@ To list all existing users execute this:
 $ bin/console user:list
 ```
 
+ > In list view you can switch to edit mode with 'e' and quit with 'q' option
+
 To jump to exact page execute this:
 ```console
 $ bin/console user:list {page_number}
