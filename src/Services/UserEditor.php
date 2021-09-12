@@ -46,8 +46,7 @@ class UserEditor implements UserEditorInterface
         NormalizerInterface    $normalizer,
         int                    $colWidth,
         Ask                    $ask
-    )
-    {
+    ) {
         $this->input = $input;
         $this->output = $output;
         $this->em = $em;

@@ -34,10 +34,9 @@ abstract class QuestionAbstract implements QuestionInterface
         OutputInterface              $output,
         string                       $question,
         UserPasswordEncoderInterface $passwordEncoder,
-                                     $user,
-                                     $options
-    )
-    {
+        $user,
+        $options
+    ) {
         $this->io = $io;
         $this->question = $question;
         $this->input = $input;
