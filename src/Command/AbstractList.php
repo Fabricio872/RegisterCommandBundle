@@ -104,7 +104,7 @@ abstract class AbstractList extends Command
         $this->limitUsers = $this->input->getOption('limit');
 
         if ($this->totalUsers == 0) {
-            $this->io->warning("Table is empty");
+            $this->io->warning("User Table is empty");
             return 0;
         }
 
