@@ -52,17 +52,15 @@ class UserListCommand extends AbstractList
 
         $table->render();
 
-        if ($this->getTotalPages() > 1) {
-            $this->io->writeln('To exit type "q" and press <return>');
-            $this->io->writeln('To switch to editing mode type "e" and press <return>');
-            $page = $this->getPage($this->askPage());
+        $this->io->writeln('To exit type "q" and press <return>');
+        $this->io->writeln('To switch to editing mode type "e" and press <return>');
+        $page = $this->getPage($this->askPage());
 
-            if ($page === null) {
-                return 0;
-            }
-
-            $this->draw($page);
+        if ($page === null) {
+            return 0;
         }
+
+        $this->draw($page);
         return 0;
     }
 
