@@ -18,7 +18,7 @@ class ListInput extends QuestionAbstract
     public function getAnswer()
     {
         if (!is_array($this->options)) {
-            throw new \Exception('Please provide "options" option in User entity annotation with values in array');
+            throw new \Exception('Please provide "options" option in User entity annotation with values in array example: {"ROLE_USER", "ROLE_ADMIN"}');
         }
 
         $this->io->writeln("<info> $this->question</info>:");

@@ -71,7 +71,7 @@ class UserListCommand extends AbstractList
     protected function getPage($page): ?int
     {
         if (strtolower($page) == 'q') {
-            $this->io->writeln('Bye');
+            $this->io->writeln('Bye (=◉ᆽ◉=)');
             return null;
         }
         if (strtolower($page) == 'e') {
