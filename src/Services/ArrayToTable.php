@@ -27,7 +27,7 @@ class ArrayToTable
     {
         $table = new Table($this->output);
 
-        if (!$this->array){
+        if (!$this->array) {
             throw new \Exception("User Table is empty");
         }
         $table->setHeaders(array_keys($this->array[0]));

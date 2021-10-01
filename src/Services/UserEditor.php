@@ -47,8 +47,7 @@ class UserEditor implements UserEditorInterface
         NormalizerInterface    $normalizer,
         int                    $colWidth,
         Ask                    $ask
-    )
-    {
+    ) {
         $this->input = $input;
         $this->output = $output;
         $this->em = $em;
@@ -112,10 +111,10 @@ class UserEditor implements UserEditorInterface
             }
             $this->cursorEnd[1] = count($this->normalizer->normalize($user));
         }
-        if (!$userArray){
+        if (!$userArray) {
             $this->output->writeln([
                 "User Table is empty",
-                "Press <RETURN> to continue"
+                "Press <RETURN> to continue",
             ]);
             return;
         }
@@ -143,7 +142,6 @@ class UserEditor implements UserEditorInterface
         // Did we read an escape sequence?
         $char .= fread($this->stream, 2);
         if (empty($char[2]) || !in_array($char[2], ['A', 'B', 'C', 'D'])) {
-
             if (empty($char[2]) || $char[2] == "3") {
                 $this->stopInteractiveMode();
                 $this->deleteUser();
