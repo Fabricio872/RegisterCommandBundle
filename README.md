@@ -5,7 +5,7 @@
 ![Packagist Downloads](https://img.shields.io/packagist/dt/Fabricio872/register-command)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Fabricio872/RegisterCommand?style=social)
 
-# Developed by: 
+# Valuable partners: 
 
 ![PhpStorm logo](https://resources.jetbrains.com/storage/products/company/brand/logos/PhpStorm.svg)
 
