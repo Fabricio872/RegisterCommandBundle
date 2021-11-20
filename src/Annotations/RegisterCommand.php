@@ -2,10 +2,15 @@
 
 namespace Fabricio872\RegisterCommand\Annotations;
 
+use Attribute;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
+
 /**
  * @Annotation
+ * @NamedArgumentConstructor()
  * @Target({"PROPERTY"})
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class RegisterCommand
 {
     /**
@@ -69,4 +74,30 @@ class RegisterCommand
      * @var string
      */
     public $valueDateTime;
+
+    public function __construct(
+        ?string $field = null,
+        ?string $question = null,
+        mixed  $options = null,
+        bool   $userIdentifier = false,
+        ?bool   $valueBoolean = null,
+        ?string $valueString = null,
+        ?string $valuePassword = null,
+        ?array  $valueArray = null,
+        ?int    $valueInt = null,
+        ?float  $valueFloat = null,
+        ?string $valueDateTime = null
+    ) {
+        $this->field = $field;
+        $this->question = $question;
+        $this->options = $options;
+        $this->userIdentifier = $userIdentifier;
+        $this->valueBoolean = $valueBoolean;
+        $this->valueString = $valueString;
+        $this->valuePassword = $valuePassword;
+        $this->valueArray = $valueArray;
+        $this->valueInt = $valueInt;
+        $this->valueFloat = $valueFloat;
+        $this->valueDateTime = $valueDateTime;
+    }
 }
