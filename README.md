@@ -76,7 +76,7 @@ RegisterBundle:
  > note: In case of combining Annotations and Attributes of this bundle only Attributes will be used.
 
  - Documentation for Annotation usage is [here](https://github.com/Fabricio872/RegisterCommandBundle/tree/main/docs/ANNOTATION_EXAMPLES.md) 
- - Documentation for Attributes (PHP 8) usage is [here](https://github.com/Fabricio872/RegisterCommandBundle/tree/main/docs/ATTRUBUTE_EXAMPLES.md) 
+ - Documentation for Attributes (PHP 8) usage is [here](https://github.com/Fabricio872/RegisterCommandBundle/tree/main/docs/ATTRIBUTE_EXAMPLES.md) 
 
 ## Finally, you are ready to register some users.
 
