@@ -28,7 +28,7 @@ class RegisterCommand
 
     /**
      * Question that has to be asked user
-     * @var mixed
+     * @var array
      */
     public $options;
 
@@ -78,7 +78,7 @@ class RegisterCommand
     public function __construct(
         ?string $field = null,
         ?string $question = null,
-        mixed  $options = null,
+        ?array  $options = null,
         bool   $userIdentifier = false,
         ?bool   $valueBoolean = null,
         ?string $valueString = null,
