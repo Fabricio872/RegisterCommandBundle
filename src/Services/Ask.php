@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\Reader;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
+use mysql_xdevapi\Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -70,10 +71,12 @@ class Ask
         /** @var ?RegisterCommand $annotation */
         $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), RegisterCommand::class);
 
-        $attributes = $userReflection->getProperty($propertyName)->getAttributes();
-        foreach ($attributes as $attribute) {
-            if ($attribute->getName() == RegisterCommand::class) {
-                $annotation = $attribute->newInstance();
+        if (property_exists($userReflection->getProperty($propertyName), 'getAttributes')) {
+            $attributes = $userReflection->getProperty($propertyName)->getAttributes();
+            foreach ($attributes as $attribute) {
+                if ($attribute->getName() == RegisterCommand::class) {
+                    $annotation = $attribute->newInstance();
+                }
             }
         }
 
