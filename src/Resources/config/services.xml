@@ -5,33 +5,31 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <defaults autowire="true" autoconfigure="true"/>
-
         <!-- Explicitly configure the service -->
 
         <service id="fabricio872.register_command.command.user_register_command"
                  class="Fabricio872\RegisterCommand\Command\UserRegisterCommand"
-                 public="true">
+                 public="true" autowire="true">
             <tag name="console.command" command="user:register"/>
         </service>
 
         <service id="Fabricio872\RegisterCommand\Command\UserRegisterCommand"
-                 class="fabricio872.register_command.command.user_register_command"
+                 alias="fabricio872.register_command.command.user_register_command"
                  public="false"/>
 
         <service id="fabricio872.register_command.command.user_list_command"
                  class="Fabricio872\RegisterCommand\Command\UserListCommand"
-                 public="true">
+                 public="true" autowire="true">
             <tag name="console.command" command="user:list"/>
         </service>
 
         <service id="Fabricio872\RegisterCommand\Command\UserListCommand"
-                 class="fabricio872.register_command.command.user_list_command"
+                 alias="fabricio872.register_command.command.user_list_command"
                  public="false"/>
 
         <service id="fabricio872.register_command.annotations.register_command" class="Fabricio872\RegisterCommand\Annotations\RegisterCommand"
                  public="true"/>
-        <service id="Fabricio872\RegisterCommand\Annotations\RegisterCommand" class="fabricio872.register_command.annotations.register_command"
+        <service id="Fabricio872\RegisterCommand\Annotations\RegisterCommand" alias="fabricio872.register_command.annotations.register_command"
                  public="false"/>
     </services>
 </container>
