@@ -71,7 +71,7 @@ class Ask
         /** @var ?RegisterCommand $annotation */
         $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), RegisterCommand::class);
 
-        if (property_exists($userReflection->getProperty($propertyName), 'getAttributes')) {
+        if (method_exists($userReflection->getProperty($propertyName), 'getAttributes')) {
             $attributes = $userReflection->getProperty($propertyName)->getAttributes();
             foreach ($attributes as $attribute) {
                 if ($attribute->getName() == RegisterCommand::class) {
