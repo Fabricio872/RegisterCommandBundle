@@ -10,7 +10,6 @@ class ListInput extends QuestionAbstract
 
     private $sttyMode;
     private $stream;
-    private $values = [];
     private $activeList = [];
     private $tableExist = false;
     private $cursor = 0;

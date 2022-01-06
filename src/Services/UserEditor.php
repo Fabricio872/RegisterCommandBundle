@@ -6,13 +6,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Id;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Helpers\StreamableInput;
-use Fabricio872\RegisterCommand\Serializer\UserEntityNormalizer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 class UserEditor implements UserEditorInterface
 {
@@ -26,8 +23,6 @@ class UserEditor implements UserEditorInterface
     private $em;
     /** @var array */
     private $userList;
-    /** @var NormalizerInterface */
-    private $normalizer;
     /*** @var int */
     private $colWidth;
     /** @var array */
@@ -38,13 +33,16 @@ class UserEditor implements UserEditorInterface
     private $tableLines;
     /** @var Ask */
     private $ask;
+    /** @var bool|resource */
+    private $stream;
+    /** @var string */
+    private $sttyMode;
 
     public function __construct(
         InputInterface $input,
         OutputInterface $output,
         EntityManagerInterface $em,
         array $userList,
-        NormalizerInterface $normalizer,
         int $colWidth,
         Ask $ask
     ) {
@@ -52,7 +50,6 @@ class UserEditor implements UserEditorInterface
         $this->output = $output;
         $this->em = $em;
         $this->userList = $userList;
-        $this->normalizer = $normalizer;
         $this->colWidth = $colWidth;
         $this->ask = $ask;
     }
@@ -106,10 +103,10 @@ class UserEditor implements UserEditorInterface
         $userArray = [];
         $this->cursorEnd[0] = count($this->userList);
         foreach ($this->userList as $row => $user) {
-            foreach ($this->getSerializer()->normalize($this->normalizer->normalize($user)) as $col => $item) {
-                $userArray[$row][array_keys($this->normalizer->normalize($user))[$col]] = (($this->cursor == [$row, $col]) ? "> " : "  ") . $item;
+            foreach (StaticMethods::getSerializer()->normalize(StaticMethods::getSerializer()->normalize($user)) as $col => $item) {
+                $userArray[$row][array_keys(StaticMethods::getSerializer()->normalize($user))[$col]] = (($this->cursor == [$row, $col]) ? "> " : "  ") . $item;
             }
-            $this->cursorEnd[1] = count($this->normalizer->normalize($user));
+            $this->cursorEnd[1] = count(StaticMethods::getSerializer()->normalize($user));
         }
         if (!$userArray) {
             $this->output->writeln([
@@ -211,26 +208,17 @@ class UserEditor implements UserEditorInterface
         $this->output->write($frame);
     }
 
-    /**
-     * @return Serializer
-     */
-    private function getSerializer(): Serializer
-    {
-        $normalizers = [new UserEntityNormalizer()];
-
-        return new Serializer($normalizers);
-    }
-
     private function updateValue(): void
     {
         $io = new SymfonyStyle($this->input, $this->output);
-        $userReflection = new \ReflectionClass($this->ask->getUserClassName());
         $user = $this->userList[$this->cursor[0]];
         try {
-            $property = $userReflection->getProperty(array_keys($this->normalizer->normalize($user))[$this->cursor[1]]);
+            $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), array_keys(StaticMethods::getSerializer()->normalize($user))[$this->cursor[1]]);
+            $userReflection = new \ReflectionClass($this->ask->getUserClassName());
+            $property = $userReflection->getProperty(array_keys(StaticMethods::getSerializer()->normalize($user))[$this->cursor[1]]);
             if (
-                $this->ask->getReader()->getPropertyAnnotation($property, RegisterCommand::class) &&
-                $this->ask->getReader()->getPropertyAnnotation($property, RegisterCommand::class)->field
+                $annotation &&
+                $annotation->field
             ) {
                 $property->setAccessible(true);
                 $property->setValue($user, $this->ask->ask($property->getName()));
@@ -265,7 +253,7 @@ class UserEditor implements UserEditorInterface
             }
         }
         foreach ($userReflection->getProperties() as $property) {
-            $annotation = $this->ask->getReader()->getPropertyAnnotation($property, RegisterCommand::class);
+            $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), $property->getName());
             if ($annotation && $annotation->userIdentifier == true) {
                 $property->setAccessible(true);
                 $identifier = $property->getValue($user);

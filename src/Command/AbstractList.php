@@ -2,6 +2,7 @@
 
 namespace Fabricio872\RegisterCommand\Command;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -12,7 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractList extends Command
@@ -39,8 +39,6 @@ abstract class AbstractList extends Command
     protected $limitUsers;
     /** @var int */
     protected $currentPage = 0;
-    /** @var NormalizerInterface */
-    protected $normalizer;
     /** @var UserPasswordHasherInterface */
     protected $passwordEncoder;
     /** @var Reader */
@@ -59,18 +57,15 @@ abstract class AbstractList extends Command
         int $tableLimit,
         int $maxColWidth,
         EntityManagerInterface $em,
-        NormalizerInterface $normalizer,
         UserPasswordHasherInterface $passwordEncoder,
-        Reader $reader,
         ValidatorInterface $validator
     ) {
         $this->userClassName = $userClassName;
         $this->tableLimit = $tableLimit;
         $this->maxColWidth = $maxColWidth;
         $this->em = $em;
-        $this->normalizer = $normalizer;
         $this->passwordEncoder = $passwordEncoder;
-        $this->reader = $reader;
+        $this->reader = new AnnotationReader();
         $this->validator = $validator;
         parent::__construct();
     }
