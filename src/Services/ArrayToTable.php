@@ -33,7 +33,7 @@ class ArrayToTable
         $table->setHeaders(array_keys($this->array[0]));
 
         $table->setRows(array_map(function ($user) {
-            return iterator_to_array($this->getSerializer()->normalize($user));
+            return $this->getSerializer()->normalize($user);
         }, $this->array));
         $table->setStyle('box');
 
