@@ -5,15 +5,13 @@ namespace Fabricio872\RegisterCommand\Command;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Fabricio872\RegisterCommand\Services\Ask;
+use Fabricio872\RegisterCommand\Services\StaticMethods;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserRegisterCommand extends Command
@@ -91,23 +89,12 @@ class UserRegisterCommand extends Command
             $data[$property->getName()] = $ask->ask($property->getName());
         }
 
-        $user = $this->getSerializer()->denormalize($data, $this->userClassName);
+        $user = StaticMethods::getSerializer()->denormalize($data, $this->userClassName);
 
         $this->em->persist($user);
         $this->em->flush();
 
         $this->io->success('User' . $ask->getUserIdentifier() . 'registered.');
         return 0;
-    }
-
-    /**
-     * @return Serializer
-     */
-    private function getSerializer(): Serializer
-    {
-        $encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-
-        return new Serializer($normalizers, $encoders);
     }
 }

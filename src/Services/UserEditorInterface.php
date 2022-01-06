@@ -14,7 +14,6 @@ interface UserEditorInterface
         OutputInterface        $output,
         EntityManagerInterface $em,
         array                  $userList,
-        NormalizerInterface    $normalizer,
         int                    $colWidth,
         Ask                    $ask
     );

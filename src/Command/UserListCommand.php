@@ -4,6 +4,7 @@ namespace Fabricio872\RegisterCommand\Command;
 
 use Fabricio872\RegisterCommand\Services\ArrayToTable;
 use Fabricio872\RegisterCommand\Services\Ask;
+use Fabricio872\RegisterCommand\Services\StaticMethods;
 use Fabricio872\RegisterCommand\Services\UserEditor;
 use Fabricio872\RegisterCommand\Services\UserEditorInterface;
 
@@ -36,7 +37,7 @@ class UserListCommand extends AbstractList
 
         $userArray = [];
         foreach ($this->userList as $user) {
-            $userArray[] = $this->normalizer->normalize($user);
+            $userArray[] = StaticMethods::getSerializer()->normalize($user);
         }
         $objectToTable = new ArrayToTable(
             $userArray,
@@ -81,7 +82,6 @@ class UserListCommand extends AbstractList
                 $this->output,
                 $this->em,
                 $this->userList,
-                $this->normalizer,
                 $this->colWidth,
                 $this->buildAsk()
             );

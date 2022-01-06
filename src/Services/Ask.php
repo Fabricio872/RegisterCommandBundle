@@ -67,17 +67,7 @@ class Ask
     public function ask(string $propertyName)
     {
         $userReflection = new \ReflectionClass($this->userClassName);
-        /** @var ?RegisterCommand $annotation */
-        $annotation = $this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), RegisterCommand::class);
-
-        if (method_exists($userReflection->getProperty($propertyName), 'getAttributes')) {
-            $attributes = $userReflection->getProperty($propertyName)->getAttributes();
-            foreach ($attributes as $attribute) {
-                if ($attribute->getName() == RegisterCommand::class) {
-                    $annotation = $attribute->newInstance();
-                }
-            }
-        }
+        $annotation = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
 
         if ($annotation == null) {
             return null;
@@ -173,7 +163,7 @@ class Ask
             case 'valueString':
                 return (string)$value;
             case 'valuePassword':
-                return (string)$this->passwordEncoder->encodePassword(new $this->userClassName(), $value);
+                return (string)$this->passwordEncoder->hashPassword(new $this->userClassName(), $value);
             case 'valueArray':
                 return (array)$value;
             case 'valueInt':
@@ -201,6 +191,7 @@ class Ask
                             if ($annotation instanceof Constraint) {
                                 return $annotation;
                             }
+                            return null;
                         },
                         $this->reader->getPropertyAnnotations(
                             $userReflection->getProperty($propertyName)

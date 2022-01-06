@@ -33,7 +33,7 @@ class ArrayToTable
         $table->setHeaders(array_keys($this->array[0]));
 
         $table->setRows(array_map(function ($user) {
-            return $this->getSerializer()->normalize($user);
+            return StaticMethods::getSerializer()->normalize($user);
         }, $this->array));
         $table->setStyle('box');
 
@@ -43,15 +43,5 @@ class ArrayToTable
     public function getCols(): array
     {
         return array_keys($this->array[0]);
-    }
-
-    /**
-     * @return Serializer
-     */
-    private function getSerializer(): Serializer
-    {
-        $normalizers = [new UserEntityNormalizer()];
-
-        return new Serializer($normalizers);
     }
 }
