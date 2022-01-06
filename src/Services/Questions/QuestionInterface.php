@@ -5,7 +5,7 @@ namespace Fabricio872\RegisterCommand\Services\Questions;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 interface QuestionInterface
@@ -15,7 +15,7 @@ interface QuestionInterface
         InputInterface $input,
         OutputInterface $output,
         string $question,
-        UserPasswordEncoderInterface $passwordEncoder,
+        UserPasswordHasherInterface $passwordEncoder,
         UserInterface $user,
         $options
     );

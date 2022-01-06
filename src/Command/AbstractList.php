@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -41,7 +41,7 @@ abstract class AbstractList extends Command
     protected $currentPage = 0;
     /** @var NormalizerInterface */
     protected $normalizer;
-    /** @var UserPasswordEncoderInterface */
+    /** @var UserPasswordHasherInterface */
     protected $passwordEncoder;
     /** @var Reader */
     protected $reader;
@@ -55,14 +55,14 @@ abstract class AbstractList extends Command
      * @param EntityManagerInterface $em
      */
     public function __construct(
-        string                       $userClassName,
-        int                          $tableLimit,
-        int                          $maxColWidth,
-        EntityManagerInterface       $em,
-        NormalizerInterface          $normalizer,
-        UserPasswordEncoderInterface $passwordEncoder,
-        Reader                       $reader,
-        ValidatorInterface           $validator
+        string $userClassName,
+        int $tableLimit,
+        int $maxColWidth,
+        EntityManagerInterface $em,
+        NormalizerInterface $normalizer,
+        UserPasswordHasherInterface $passwordEncoder,
+        Reader $reader,
+        ValidatorInterface $validator
     ) {
         $this->userClassName = $userClassName;
         $this->tableLimit = $tableLimit;

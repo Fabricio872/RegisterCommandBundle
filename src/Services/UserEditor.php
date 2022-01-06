@@ -40,13 +40,13 @@ class UserEditor implements UserEditorInterface
     private $ask;
 
     public function __construct(
-        InputInterface         $input,
-        OutputInterface        $output,
+        InputInterface $input,
+        OutputInterface $output,
         EntityManagerInterface $em,
-        array                  $userList,
-        NormalizerInterface    $normalizer,
-        int                    $colWidth,
-        Ask                    $ask
+        array $userList,
+        NormalizerInterface $normalizer,
+        int $colWidth,
+        Ask $ask
     ) {
         $this->input = $input;
         $this->output = $output;
@@ -106,7 +106,7 @@ class UserEditor implements UserEditorInterface
         $userArray = [];
         $this->cursorEnd[0] = count($this->userList);
         foreach ($this->userList as $row => $user) {
-            foreach (iterator_to_array($this->getSerializer()->normalize($this->normalizer->normalize($user))) as $col => $item) {
+            foreach ($this->getSerializer()->normalize($this->normalizer->normalize($user)) as $col => $item) {
                 $userArray[$row][array_keys($this->normalizer->normalize($user))[$col]] = (($this->cursor == [$row, $col]) ? "> " : "  ") . $item;
             }
             $this->cursorEnd[1] = count($this->normalizer->normalize($user));

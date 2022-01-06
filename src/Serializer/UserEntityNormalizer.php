@@ -2,7 +2,6 @@
 
 namespace Fabricio872\RegisterCommand\Serializer;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UserEntityNormalizer implements NormalizerInterface
@@ -14,9 +13,11 @@ class UserEntityNormalizer implements NormalizerInterface
 
     public function normalize($objects, $format = null, array $context = [])
     {
+        $normalized = [];
         foreach ($objects as $object) {
-            yield $this->processProperty($object);
+            $normalized[] = $this->processProperty($object);
         }
+        return $normalized;
     }
 
     private function processProperty($property)

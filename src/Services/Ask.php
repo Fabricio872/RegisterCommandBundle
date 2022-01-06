@@ -6,11 +6,10 @@ use Doctrine\Common\Annotations\Reader;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
-use mysql_xdevapi\Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -27,7 +26,7 @@ class Ask
     private $input;
     /** @var OutputInterface */
     private $output;
-    /** @var UserPasswordEncoderInterface $passwordEncoder */
+    /** @var UserPasswordHasherInterface $passwordEncoder */
     private $passwordEncoder;
     /** @var string $userIdentifier */
     private $userIdentifier = ' ';
@@ -40,7 +39,7 @@ class Ask
         SymfonyStyle                 $io,
         InputInterface               $input,
         OutputInterface              $output,
-        UserPasswordEncoderInterface $passwordEncoder,
+        UserPasswordHasherInterface $passwordEncoder,
         ValidatorInterface           $validator
     ) {
         $this->userClassName = $userClassName;

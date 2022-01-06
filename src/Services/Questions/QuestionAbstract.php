@@ -5,7 +5,7 @@ namespace Fabricio872\RegisterCommand\Services\Questions;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class QuestionAbstract implements QuestionInterface
 {
@@ -17,7 +17,7 @@ abstract class QuestionAbstract implements QuestionInterface
     protected $output;
     /** @var string $question */
     protected $question;
-    /** @var UserPasswordEncoderInterface $passwordEncoder */
+    /** @var UserPasswordHasherInterface $passwordEncoder */
     protected $passwordEncoder;
     protected $user;
     protected $options;
@@ -26,14 +26,14 @@ abstract class QuestionAbstract implements QuestionInterface
      * QuestionAbstract constructor.
      * @param SymfonyStyle $io
      * @param string $question
-     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param UserPasswordHasherInterface $passwordEncoder
      */
     public function __construct(
-        SymfonyStyle                 $io,
-        InputInterface               $input,
-        OutputInterface              $output,
-        string                       $question,
-        UserPasswordEncoderInterface $passwordEncoder,
+        SymfonyStyle $io,
+        InputInterface $input,
+        OutputInterface $output,
+        string $question,
+        UserPasswordHasherInterface $passwordEncoder,
         $user,
         $options
     ) {

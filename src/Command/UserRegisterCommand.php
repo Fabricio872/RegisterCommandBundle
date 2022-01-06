@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -21,7 +21,7 @@ class UserRegisterCommand extends Command
     protected static $defaultDescription = 'Register new user';
     /** @var string $userClassName */
     private $userClassName;
-    /** @var UserPasswordEncoderInterface $passwordEncoder */
+    /** @var UserPasswordHasherInterface $passwordEncoder */
     private $passwordEncoder;
     /** @var Reader $reader */
     private $reader;
@@ -35,13 +35,13 @@ class UserRegisterCommand extends Command
     /**
      * UserRegisterCommand constructor.
      * @param string $userClassName
-     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param UserPasswordHasherInterface $passwordEncoder
      * @param Reader $reader
      * @param EntityManagerInterface $em
      */
     public function __construct(
         string $userClassName,
-        UserPasswordEncoderInterface $passwordEncoder,
+        UserPasswordHasherInterface $passwordEncoder,
         Reader $reader,
         EntityManagerInterface $em,
         ValidatorInterface $validator

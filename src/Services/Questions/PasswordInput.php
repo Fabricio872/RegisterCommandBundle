@@ -6,7 +6,7 @@ class PasswordInput extends QuestionAbstract
 {
     public function getAnswer(): ?string
     {
-        return is_null($password = $this->validated()) ? null : $this->passwordEncoder->encodePassword($this->user, $password);
+        return is_null($password = $this->validated()) ? null : $this->passwordEncoder->hashPassword($this->user, $password);
     }
 
     private function validated(): ?string
