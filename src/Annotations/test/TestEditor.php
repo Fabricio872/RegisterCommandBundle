@@ -9,13 +9,8 @@ use Fabricio872\RegisterCommand\Annotations\AbstractEditor;
 class TestEditor extends AbstractEditor
 {
 
-    public function askTTY()
+    public function askSymfonyStyleEngine()
     {
-        return "testTTY";
-    }
-
-    public function askNoTTY()
-    {
-        return "testNoTTY";
+        return "test";
     }
 }

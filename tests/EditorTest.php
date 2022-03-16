@@ -3,11 +3,24 @@
 namespace Fabricio872\RegisterCommand\Tests;
 
 use Fabricio872\RegisterCommand\Entity\User;
+use Fabricio872\RegisterCommand\Exceptions\EngineNotSetException;
+use Fabricio872\RegisterCommand\Exceptions\EngineNotSupported;
 use Fabricio872\RegisterCommand\Services\Editor;
+use Fabricio872\RegisterCommand\Services\engine\SymfonyStyleEngine;
+use Fabricio872\RegisterCommand\Services\engine\TestEngine;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class EditorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Editor::$ENGINE = null;
+    }
+
+
     public function test_editor_must_respond_with_user_entity()
     {
         $user = new User();
@@ -21,12 +34,29 @@ class EditorTest extends TestCase
         $user = new User();
         $editor = new Editor($user);
 
+        Editor::$ENGINE = new SymfonyStyle($this->createMock(SymfonyStyleEngine::class));
         $editor->run();
 
         $this->assertEquals("testNoTTY", $editor->getEntity()->getEmail());
+    }
 
-        Editor::$TTY = true;
+    public function test_engine_is_set_exception()
+    {
+        $user = new User();
+        $editor = new Editor($user);
+
+        $this->expectException(EngineNotSetException::class);
         $editor->run();
-        $this->assertEquals("testTTY", $editor->getEntity()->getEmail());
+    }
+
+    public function test_engine_not_supported_exception()
+    {
+        $user = new User();
+        $editor = new Editor($user);
+
+        Editor::$ENGINE = new TestEngine();
+
+        $this->expectException(EngineNotSupported::class);
+        $editor->run();
     }
 }
