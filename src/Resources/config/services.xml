@@ -7,29 +7,18 @@
     <services>
         <!-- Explicitly configure the service -->
 
-        <service id="fabricio872.register_command.command.user_register_command"
-                 class="Fabricio872\RegisterCommand\Command\UserRegisterCommand"
+        <service id="fabricio872.register_command.command.user_add_command"
+                 class="Fabricio872\RegisterCommand\Command\UserAddCommand"
                  public="true" autowire="true">
-            <tag name="console.command" command="user:register"/>
+                <argument type="service" id="fabricio872.register_command.engine" key="$engine"/>
+            <tag name="console.command" command="user:add"/>
         </service>
 
-        <service id="Fabricio872\RegisterCommand\Command\UserRegisterCommand"
-                 alias="fabricio872.register_command.command.user_register_command"
+        <service id="Fabricio872\RegisterCommand\Command\UserAddCommand"
+                 alias="fabricio872.register_command.command.user_add_command"
                  public="false"/>
 
-        <service id="fabricio872.register_command.command.user_list_command"
-                 class="Fabricio872\RegisterCommand\Command\UserListCommand"
-                 public="true" autowire="true">
-            <tag name="console.command" command="user:list"/>
-        </service>
+        <service id="fabricio872.register_command.engine" class="Fabricio872\RegisterCommand\Services\engine\SymfonyStyleEngine" autowire="true"/>
 
-        <service id="Fabricio872\RegisterCommand\Command\UserListCommand"
-                 alias="fabricio872.register_command.command.user_list_command"
-                 public="false"/>
-
-        <service id="fabricio872.register_command.annotations.register_command" class="Fabricio872\RegisterCommand\Annotations\RegisterCommand"
-                 public="true"/>
-        <service id="Fabricio872\RegisterCommand\Annotations\RegisterCommand" alias="fabricio872.register_command.annotations.register_command"
-                 public="false"/>
     </services>
 </container>

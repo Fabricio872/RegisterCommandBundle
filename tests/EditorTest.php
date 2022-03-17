@@ -34,7 +34,7 @@ class EditorTest extends TestCase
         $user = new User();
         $editor = new Editor($user);
 
-        Editor::$ENGINE = new SymfonyStyleEngine($this->createMock(SymfonyStyle::class));
+        Editor::$ENGINE = new TestEngine();
         $editor->run();
 
         $this->assertEquals("test", $editor->getEntity()->getEmail());
@@ -54,7 +54,7 @@ class EditorTest extends TestCase
         $user = new User();
         $editor = new Editor($user);
 
-        Editor::$ENGINE = new TestEngine();
+        Editor::$ENGINE = new SymfonyStyleEngine($this->createMock(SymfonyStyle::class));
 
         $this->expectException(EngineNotSupported::class);
         $editor->run();

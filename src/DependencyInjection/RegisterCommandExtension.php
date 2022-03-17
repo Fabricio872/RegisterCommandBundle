@@ -17,12 +17,10 @@ class RegisterCommandExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        $registerDefinition = $container->getDefinition('fabricio872.register_command.command.user_register_command');
+        $registerDefinition = $container->getDefinition('fabricio872.register_command.command.user_add_command');
         $registerDefinition->setArgument(0, $config['user_class']);
+        $registerDefinition->setArgument(1, $config['default_engine']);
+        $registerDefinition->setArgument(2, $config['engine_configs']);
 
-        $listDefinition = $container->getDefinition('fabricio872.register_command.command.user_list_command');
-        $listDefinition->setArgument(0, $config['user_class']);
-        $listDefinition->setArgument(1, $config['table_limit']);
-        $listDefinition->setArgument(2, $config['max_col_width']);
     }
 }

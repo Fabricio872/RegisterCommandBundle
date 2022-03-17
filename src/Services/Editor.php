@@ -26,7 +26,7 @@ class Editor
     }
 
     /**
-     * @throws EngineNotSetException
+     * @throws EngineNotSetException|EngineNotSupported
      */
     public function run()
     {

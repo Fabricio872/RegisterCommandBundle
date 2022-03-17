@@ -9,7 +9,7 @@ use Fabricio872\RegisterCommand\Annotations\AbstractEditor;
 class TestEditor extends AbstractEditor
 {
 
-    public function askSymfonyStyleEngine()
+    public function askTestEngine()
     {
         return "test";
     }
