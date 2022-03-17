@@ -6,11 +6,8 @@ abstract class AbstractEditor
 {
     public ?string $question;
 
-    public bool $userIdentifier;
-
-    public function __construct(?string $question = null, ?bool $userIdentifier = false)
+    public function __construct(?string $question = null)
     {
         $this->question = $question;
-        $this->userIdentifier = $userIdentifier;
     }
 }
