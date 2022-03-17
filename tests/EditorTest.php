@@ -34,10 +34,10 @@ class EditorTest extends TestCase
         $user = new User();
         $editor = new Editor($user);
 
-        Editor::$ENGINE = new SymfonyStyle($this->createMock(SymfonyStyleEngine::class));
+        Editor::$ENGINE = new SymfonyStyleEngine($this->createMock(SymfonyStyle::class));
         $editor->run();
 
-        $this->assertEquals("testNoTTY", $editor->getEntity()->getEmail());
+        $this->assertEquals("test", $editor->getEntity()->getEmail());
     }
 
     public function test_engine_is_set_exception()

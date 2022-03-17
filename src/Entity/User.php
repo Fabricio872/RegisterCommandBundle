@@ -61,14 +61,9 @@ class User implements UserInterface
         return $this->id;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
-    public function getUsername(): string
+    public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return $this->email;
     }
 
     /**
