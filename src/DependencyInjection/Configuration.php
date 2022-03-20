@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
                         ->ignoreExtraKeys()
                         ->addDefaultsIfNotSet()
                         ->children()
-                            ->scalarNode("engine")->defaultValue('Fabricio872\RegisterCommand\Services\engine\SymfonyStyleEngine')->info('Engine class for rendering terminal interface')->end()
+                            ->scalarNode("engine")->defaultValue('Fabricio872\RegisterCommand\Services\Engines\SymfonyStyleEngine')->info('Engine class for rendering terminal interface')->end()
                             ->scalarNode("table_limit")->defaultValue(10)->info('Sets default value for maximum rows on single page of list table')->end()
                             ->scalarNode("max_col_width")->defaultValue(64)->info('Sets maximum width for single column in characters')->end()
                         ->end()

@@ -3,7 +3,7 @@
 namespace Fabricio872\RegisterCommand\Command;
 
 use Exception;
-use Fabricio872\RegisterCommand\Services\engine\EngineInterface;
+use Fabricio872\RegisterCommand\Services\Engines\EngineInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

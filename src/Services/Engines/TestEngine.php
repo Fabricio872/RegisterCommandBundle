@@ -1,6 +1,6 @@
 <?php
 
-namespace Fabricio872\RegisterCommand\Services\engine;
+namespace Fabricio872\RegisterCommand\Services\Engines;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -18,7 +18,25 @@
                  alias="fabricio872.register_command.command.user_add_command"
                  public="false"/>
 
-        <service id="fabricio872.register_command.engine" class="Fabricio872\RegisterCommand\Services\engine\SymfonyStyleEngine" autowire="true"/>
+        <service id="fabricio872.register_command.services.editor"
+                 class="Fabricio872\RegisterCommand\Services\Editor"
+                 public="true" autowire="true">
+        </service>
+
+        <service id="Fabricio872\RegisterCommand\Services\Editor"
+                 alias="fabricio872.register_command.services.editor"
+                 public="false"/>
+
+        <service id="fabricio872.register_command.services.questions.symfony_style_engine.string_input"
+                 class="Fabricio872\RegisterCommand\Services\Questions\SymfonyStyleEngine\StringInput"
+                 public="false" autowire="true">
+        </service>
+
+        <service id="Fabricio872\RegisterCommand\Services\Questions\SymfonyStyleEngine\StringInput"
+                 alias="fabricio872.register_command.services.questions.symfony_style_engine.string_input"
+                 public="true"/>
+
+        <service id="fabricio872.register_command.engine" class="Fabricio872\RegisterCommand\Services\Engines\SymfonyStyleEngine" autowire="true"/>
 
     </services>
 </container>

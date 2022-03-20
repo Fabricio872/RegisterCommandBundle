@@ -162,4 +162,9 @@ class User implements UserInterface
 
         return $this;
     }
+
+    public function getUsername()
+    {
+        // Dummy method to allow upgrade from older versions
+    }
 }
