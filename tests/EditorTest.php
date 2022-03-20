@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Fabricio872\RegisterCommand\Entity\User;
 use Fabricio872\RegisterCommand\Exceptions\EngineNotSetException;
 use Fabricio872\RegisterCommand\Exceptions\EngineNotSupported;
+use Fabricio872\RegisterCommand\Exceptions\QuestionNotFoundException;
 use Fabricio872\RegisterCommand\Services\Editor;
 use Fabricio872\RegisterCommand\Services\Engines\SymfonyStyleEngine;
 use Fabricio872\RegisterCommand\Services\Engines\TestEngine;
@@ -31,16 +32,15 @@ class EditorTest extends TestCase
         $this->assertEquals($user, $editor->getUser());;
     }
 
-    public function test_editor_calls_annotation_on_each_parameter_in_user_entity()
+    public function test_question_not_found()
     {
         $user = new User();
         $editor = new Editor($this->createMock(Container::class));
         $editor->setUser($user);
 
         Editor::$ENGINE = new TestEngine();
+        $this->expectException(QuestionNotFoundException::class);
         $editor->run();
-
-        $this->assertEquals("test", $editor->getUser()->getEmail());
     }
 
     public function test_engine_is_set_exception()

@@ -5,6 +5,7 @@ namespace Fabricio872\RegisterCommand\Services;
 use Fabricio872\RegisterCommand\Annotations\AbstractEditor;
 use Fabricio872\RegisterCommand\Exceptions\EngineNotSetException;
 use Fabricio872\RegisterCommand\Exceptions\EngineNotSupported;
+use Fabricio872\RegisterCommand\Exceptions\QuestionNotFoundException;
 use Fabricio872\RegisterCommand\Services\Engines\EngineInterface;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,7 +35,7 @@ class Editor
     }
 
     /**
-     * @throws EngineNotSetException|EngineNotSupported
+     * @throws EngineNotSetException|EngineNotSupported|QuestionNotFoundException
      */
     public function run(): void
     {
@@ -54,6 +55,9 @@ class Editor
                     }
                     /** @var QuestionInterface $question */
                     $question = $this->container->get($editor->{$this->getEngineMethod()}());
+                    if ($question == null){
+                        throw new QuestionNotFoundException($editor->{$this->getEngineMethod()}(), get_class(self::$ENGINE), $parameter->getName());
+                    }
                     $question->setField($parameter->getName());
                     $question->setEditor($editor);
                     $question->setEngine(self::$ENGINE);
