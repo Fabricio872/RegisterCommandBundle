@@ -97,7 +97,6 @@ abstract class AbstractList extends Command
         $this->input = $input;
         $this->output = $output;
         $this->io = new SymfonyStyle($this->input, $this->output);
-        /** @var int $colWidth */
         $this->colWidth = $this->input->getOption('col-width');
 
         $this->totalUsers = $this->em

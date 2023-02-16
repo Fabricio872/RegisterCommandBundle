@@ -17,8 +17,6 @@ class ListInput extends QuestionAbstract
 
     private array $activeList = [];
 
-    private false $tableExist = false;
-
     private int $cursor = 0;
 
     public function getAnswer()
@@ -99,9 +97,7 @@ class ListInput extends QuestionAbstract
 
     private function table()
     {
-        if (! $this->tableExist) {
-            $this->io->write(sprintf("\033[%dA", is_countable($this->options) ? count($this->options) : 0));
-        }
+        $this->io->write(sprintf("\033[%dA", is_countable($this->options) ? count($this->options) : 0));
         foreach ($this->options as $key => $item) {
             $this->io->writeln(($key === $this->cursor ? ">" : " ") . " [ " . (in_array($item, $this->activeList, true) ? "X" : " ") . " ] " . $item);
         }

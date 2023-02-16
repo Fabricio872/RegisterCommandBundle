@@ -86,7 +86,7 @@ class Ask
         return $this->reader;
     }
 
-    private function makeQuestion(RegisterCommand $annotation, string $propertyName): ?QuestionInterface
+    private function makeQuestion(RegisterCommand $annotation, string $propertyName): QuestionInterface
     {
         $questionName = 'Fabricio872\RegisterCommand\Services\Questions\\' . ucfirst($annotation->field) . 'Input';
 
@@ -102,11 +102,11 @@ class Ask
     }
 
     /**
-     * @return string|array|int|float|null
+     * @throws Exception
      */
-    private function getDefaultValue(RegisterCommand $command)
+    private function getDefaultValue(RegisterCommand $command): float|DateTime|int|bool|array|string|null
     {
-        foreach ($command as $annotation => $value) {
+        foreach (get_object_vars($command) as $annotation => $value) {
             if (
                 str_starts_with((string) $annotation, 'value') &&
                 $value !== null

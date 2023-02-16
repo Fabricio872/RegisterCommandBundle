@@ -23,7 +23,7 @@ trait StreamableInput
             throw new Exception('Streamable interface not found');
         }
 
-        if (empty($this->inputStream)) {
+        if (! is_resource($this->inputStream)) {
             $this->inputStream = $this->input->getStream() ?: STDIN;
         }
 

@@ -8,8 +8,6 @@ use DateTime;
 
 class DateTimeInput extends QuestionAbstract
 {
-    private array $values = [];
-
     public function getAnswer(): DateTime
     {
         $this->io->writeln("<info> $this->question</info>:");

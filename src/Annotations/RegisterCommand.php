@@ -24,7 +24,7 @@ class RegisterCommand
 
     /**
      * Question that has to be asked user
-     * @var string
+     * @var ?string
      */
     public $question;
 
