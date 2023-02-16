@@ -1,11 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Services;
 
+use DateTime;
 use Doctrine\Common\Annotations\Reader;
+use Exception;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
+use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -16,60 +22,34 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Ask
 {
-    /** @var string $userClassName */
-    private $userClassName;
-    /** @var Reader $reader */
-    private $reader;
-    /** @var SymfonyStyle $io */
-    private $io;
-    /** @var InputInterface */
-    private $input;
-    /** @var OutputInterface */
-    private $output;
-    /** @var UserPasswordHasherInterface $passwordEncoder */
-    private $passwordEncoder;
-    /** @var string $userIdentifier */
-    private $userIdentifier = ' ';
-    /** @var ValidatorInterface */
-    private $validator;
+    private string $userIdentifier = ' ';
 
     public function __construct(
-        string                       $userClassName,
-        Reader                       $reader,
-        SymfonyStyle                 $io,
-        InputInterface               $input,
-        OutputInterface              $output,
-        UserPasswordHasherInterface $passwordEncoder,
-        ValidatorInterface           $validator
+        private readonly string $userClassName,
+        private readonly Reader $reader,
+        private readonly SymfonyStyle $io,
+        private readonly InputInterface $input,
+        private readonly OutputInterface $output,
+        private readonly UserPasswordHasherInterface $passwordEncoder,
+        private readonly ValidatorInterface $validator
     ) {
-        $this->userClassName = $userClassName;
-        $this->reader = $reader;
-        $this->io = $io;
-        $this->input = $input;
-        $this->output = $output;
-        $this->passwordEncoder = $passwordEncoder;
-        $this->validator = $validator;
     }
 
-    /**
-     * @return string
-     */
     public function getUserIdentifier(): string
     {
         return $this->userIdentifier;
     }
 
     /**
-     * @param string $propertyName
      * @return string|array|int|float|null
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function ask(string $propertyName)
     {
-        $userReflection = new \ReflectionClass($this->userClassName);
+        $userReflection = new ReflectionClass($this->userClassName);
         $annotation = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
 
-        if ($annotation == null) {
+        if ($annotation === null) {
             return null;
         }
         if ($value = $this->getDefaultValue($annotation)) {
@@ -79,8 +59,8 @@ class Ask
         /** @var QuestionAbstract $question */
         $question = $this->makeQuestion($annotation, $propertyName);
 
-        if (!$question instanceof QuestionAbstract) {
-            throw new \Exception('Input class: ' . get_class($question) . ' must implement ' . QuestionInterface::class);
+        if (! $question instanceof QuestionAbstract) {
+            throw new Exception('Input class: ' . $question::class . ' must implement ' . QuestionInterface::class);
         }
 
         if ($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) {
@@ -96,28 +76,17 @@ class Ask
         return $answer;
     }
 
-    /**
-     * @return string
-     */
     public function getUserClassName(): string
     {
         return $this->userClassName;
     }
 
-    /**
-     * @return Reader
-     */
     public function getReader(): Reader
     {
         return $this->reader;
     }
 
-    /**
-     * @param RegisterCommand $annotation
-     * @param string $propertyName
-     * @return ?QuestionInterface
-     */
-    private function makeQuestion(RegisterCommand $annotation, string $propertyName): ?QuestionInterface
+    private function makeQuestion(RegisterCommand $annotation, string $propertyName): QuestionInterface
     {
         $questionName = 'Fabricio872\RegisterCommand\Services\Questions\\' . ucfirst($annotation->field) . 'Input';
 
@@ -133,14 +102,13 @@ class Ask
     }
 
     /**
-     * @param RegisterCommand $command
-     * @return string|array|int|float|null
+     * @throws Exception
      */
-    private function getDefaultValue(RegisterCommand $command)
+    private function getDefaultValue(RegisterCommand $command): float|DateTime|int|bool|array|string|null
     {
-        foreach ($command as $annotation => $value) {
+        foreach (get_object_vars($command) as $annotation => $value) {
             if (
-                substr($annotation, 0, strlen('value')) == 'value' &&
+                str_starts_with((string) $annotation, 'value') &&
                 $value !== null
             ) {
                 return $this->processValue($value, $annotation);
@@ -151,33 +119,23 @@ class Ask
 
     /**
      * @param $value
-     * @param string $annotation
-     * @return array|bool|\DateTime|float|int|string
-     * @throws \Exception
+     * @throws Exception
      */
-    private function processValue($value, string $annotation)
+    private function processValue($value, string $annotation): array|bool|DateTime|float|int|string
     {
-        switch ($annotation) {
-            case 'valueBoolean':
-                return (bool)$value;
-            case 'valueString':
-                return (string)$value;
-            case 'valuePassword':
-                return (string)$this->passwordEncoder->hashPassword(new $this->userClassName(), $value);
-            case 'valueArray':
-                return (array)$value;
-            case 'valueInt':
-                return (int)$value;
-            case 'valueFloat':
-                return (float)$value;
-            case 'valueDateTime':
-                return new \DateTime($value);
-            default:
-                throw new \Exception("Unsupported value type: " . $annotation);
-        }
+        return match ($annotation) {
+            'valueBoolean' => (bool) $value,
+            'valueString' => (string) $value,
+            'valuePassword' => (string) $this->passwordEncoder->hashPassword(new $this->userClassName(), $value),
+            'valueArray' => (array) $value,
+            'valueInt' => (int) $value,
+            'valueFloat' => (float) $value,
+            'valueDateTime' => new DateTime($value),
+            default => throw new Exception("Unsupported value type: " . $annotation),
+        };
     }
 
-    private function validate(QuestionInterface $question, \ReflectionClass $userReflection, string $propertyName)
+    private function validate(QuestionInterface $question, ReflectionClass $userReflection, string $propertyName)
     {
         $answer = $question->getAnswer();
 

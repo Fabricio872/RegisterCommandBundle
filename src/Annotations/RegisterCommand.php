@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Annotations;
 
 use Attribute;
@@ -22,7 +24,7 @@ class RegisterCommand
 
     /**
      * Question that has to be asked user
-     * @var string
+     * @var ?string
      */
     public $question;
 
@@ -78,14 +80,14 @@ class RegisterCommand
     public function __construct(
         ?string $field = null,
         ?string $question = null,
-        ?array  $options = null,
-        bool   $userIdentifier = false,
-        ?bool   $valueBoolean = null,
+        ?array $options = null,
+        bool $userIdentifier = false,
+        ?bool $valueBoolean = null,
         ?string $valueString = null,
         ?string $valuePassword = null,
-        ?array  $valueArray = null,
-        ?int    $valueInt = null,
-        ?float  $valueFloat = null,
+        ?array $valueArray = null,
+        ?int $valueInt = null,
+        ?float $valueFloat = null,
         ?string $valueDateTime = null
     ) {
         $this->field = $field;

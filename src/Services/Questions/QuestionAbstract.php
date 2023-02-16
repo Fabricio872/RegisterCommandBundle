@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -9,18 +11,20 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 abstract class QuestionAbstract implements QuestionInterface
 {
-    /** @var SymfonyStyle $io */
+    /** @var SymfonyStyle */
     protected $io;
+
     /** @var InputInterface */
     protected $input;
+
     /** @var OutputInterface */
     protected $output;
-    /** @var string $question */
+
+    /** @var string */
     protected $question;
-    /** @var UserPasswordHasherInterface $passwordEncoder */
+
+    /** @var UserPasswordHasherInterface */
     protected $passwordEncoder;
-    protected $user;
-    protected $options;
 
     /**
      * QuestionAbstract constructor.
@@ -34,16 +38,14 @@ abstract class QuestionAbstract implements QuestionInterface
         OutputInterface $output,
         string $question,
         UserPasswordHasherInterface $passwordEncoder,
-        $user,
-        $options
+        protected $user,
+        protected $options
     ) {
         $this->io = $io;
         $this->question = $question;
         $this->input = $input;
         $this->output = $output;
         $this->passwordEncoder = $passwordEncoder;
-        $this->user = $user;
-        $this->options = $options;
     }
 
     protected function writeQuestion()

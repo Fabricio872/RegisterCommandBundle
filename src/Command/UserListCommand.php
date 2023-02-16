@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Command;
 
 use Fabricio872\RegisterCommand\Services\ArrayToTable;
@@ -11,9 +13,11 @@ use Fabricio872\RegisterCommand\Services\UserEditorInterface;
 class UserListCommand extends AbstractList
 {
     protected static $defaultName = 'user:list';
+
     protected static $defaultDescription = 'List all existing users';
+
     /** @var array|object[] */
-    private $userList;
+    private ?array $userList = null;
 
     protected function configure()
     {
@@ -67,15 +71,14 @@ class UserListCommand extends AbstractList
 
     /**
      * @param $page
-     * @return int|null
      */
     protected function getPage($page): ?int
     {
-        if (strtolower($page) == 'q') {
+        if (strtolower((string) $page) === 'q') {
             $this->io->writeln('Bye (=◉ᆽ◉=)');
             return null;
         }
-        if (strtolower($page) == 'e') {
+        if (strtolower((string) $page) === 'e') {
             /** @var UserEditorInterface $userEditor */
             $userEditor = new UserEditor(
                 $this->input,
@@ -88,7 +91,7 @@ class UserListCommand extends AbstractList
             $userEditor->drawEdiTable();
             return $this->getPage($this->askPage());
         }
-        if (!is_numeric($page)) {
+        if (! is_numeric($page)) {
             $this->io->writeln('Bad input');
             return $this->getPage($this->askPage());
         }

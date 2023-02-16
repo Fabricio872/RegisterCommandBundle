@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Id;
-use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
+use Exception;
 use Fabricio872\RegisterCommand\Helpers\StreamableInput;
+use ReflectionClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 class UserEditor implements UserEditorInterface
 {
@@ -17,45 +21,32 @@ class UserEditor implements UserEditorInterface
 
     /** @var InputInterface */
     private $input;
-    /** @var OutputInterface */
-    private $output;
-    /** @var EntityManagerInterface */
-    private $em;
-    /** @var array */
-    private $userList;
-    /*** @var int */
-    private $colWidth;
-    /** @var array */
-    private $cursor = [0, 0];
-    /** @var array */
-    private $cursorEnd;
-    /** @var int */
-    private $tableLines;
-    /** @var Ask */
-    private $ask;
+
+    private array $cursor = [0, 0];
+
+    private ?array $cursorEnd = null;
+
+    private ?int $tableLines = null;
+
     /** @var bool|resource */
     private $stream;
-    /** @var string */
-    private $sttyMode;
+
+    private string|bool|null $sttyMode = null;
 
     public function __construct(
         InputInterface $input,
-        OutputInterface $output,
-        EntityManagerInterface $em,
-        array $userList,
-        int $colWidth,
-        Ask $ask
+        private readonly OutputInterface $output,
+        private readonly EntityManagerInterface $em,
+        private array $userList,
+        /*** @var int */
+        private readonly int $colWidth,
+        private readonly Ask $ask
     ) {
         $this->input = $input;
-        $this->output = $output;
-        $this->em = $em;
-        $this->userList = $userList;
-        $this->colWidth = $colWidth;
-        $this->ask = $ask;
     }
 
     /**
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function drawEdiTable(): void
     {
@@ -65,7 +56,7 @@ class UserEditor implements UserEditorInterface
 
         $this->table();
 
-        while (!feof($this->stream) && ($char = fread($this->stream, 1)) != "\n") {
+        while (! feof($this->stream) && ($char = fread($this->stream, 1)) !== "\n") {
             if (" " === $char) {
                 $this->stopInteractiveMode();
                 $this->updateValue();
@@ -93,7 +84,7 @@ class UserEditor implements UserEditorInterface
     }
 
     /**
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     private function table()
     {
@@ -104,11 +95,11 @@ class UserEditor implements UserEditorInterface
         $this->cursorEnd[0] = count($this->userList);
         foreach ($this->userList as $row => $user) {
             foreach (StaticMethods::getSerializer()->normalize(StaticMethods::getSerializer()->normalize($user)) as $col => $item) {
-                $userArray[$row][array_keys(StaticMethods::getSerializer()->normalize($user))[$col]] = (($this->cursor == [$row, $col]) ? "> " : "  ") . $item;
+                $userArray[$row][array_keys(StaticMethods::getSerializer()->normalize($user))[$col]] = (($this->cursor === [$row, $col]) ? "> " : "  ") . $item;
             }
-            $this->cursorEnd[1] = count(StaticMethods::getSerializer()->normalize($user));
+            $this->cursorEnd[1] = StaticMethods::getSerializer()->normalize($user) === null ? 0 : count(StaticMethods::getSerializer()->normalize($user));
         }
-        if (!$userArray) {
+        if (! $userArray) {
             $this->output->writeln([
                 "User Table is empty",
                 "Press <RETURN> to continue",
@@ -138,8 +129,8 @@ class UserEditor implements UserEditorInterface
     {
         // Did we read an escape sequence?
         $char .= fread($this->stream, 2);
-        if (empty($char[2]) || !in_array($char[2], ['A', 'B', 'C', 'D'])) {
-            if (empty($char[2]) || $char[2] == "3") {
+        if (empty($char[2]) || ! in_array($char[2], ['A', 'B', 'C', 'D'], true)) {
+            if (empty($char[2]) || $char[2] === "3") {
                 $this->stopInteractiveMode();
                 $this->deleteUser();
                 $this->startInteractiveMode();
@@ -214,7 +205,7 @@ class UserEditor implements UserEditorInterface
         $user = $this->userList[$this->cursor[0]];
         try {
             $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), array_keys(StaticMethods::getSerializer()->normalize($user))[$this->cursor[1]]);
-            $userReflection = new \ReflectionClass($this->ask->getUserClassName());
+            $userReflection = new ReflectionClass($this->ask->getUserClassName());
             $property = $userReflection->getProperty(array_keys(StaticMethods::getSerializer()->normalize($user))[$this->cursor[1]]);
             if (
                 $annotation &&
@@ -230,7 +221,7 @@ class UserEditor implements UserEditorInterface
                 $io->success("press any key to continue");
                 fread($this->stream, 1);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $io->warning($e->getMessage());
             $io->success("press any key to continue");
             fread($this->stream, 1);
@@ -241,8 +232,9 @@ class UserEditor implements UserEditorInterface
 
     private function deleteUser()
     {
+        $identifier = null;
         $io = new SymfonyStyle($this->input, $this->output);
-        $userReflection = new \ReflectionClass($this->ask->getUserClassName());
+        $userReflection = new ReflectionClass($this->ask->getUserClassName());
         $user = $this->userList[$this->cursor[0]];
 
         foreach ($userReflection->getProperties() as $property) {
@@ -254,13 +246,13 @@ class UserEditor implements UserEditorInterface
         }
         foreach ($userReflection->getProperties() as $property) {
             $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), $property->getName());
-            if ($annotation && $annotation->userIdentifier == true) {
+            if ($annotation && $annotation->userIdentifier === true) {
                 $property->setAccessible(true);
                 $identifier = $property->getValue($user);
             }
         }
 
-        if (substr(strtolower($io->ask("<info> Are you sure you want to delete user $identifier </info>: [Y/N]", 'n')), 1, 1) == 'y') {
+        if (substr(strtolower((string) $io->ask("<info> Are you sure you want to delete user $identifier </info>: [Y/N]", 'n')), 1, 1) === 'y') {
             $this->em->remove($user);
             $this->em->flush();
             unset($this->userList[$this->cursor[0]]);

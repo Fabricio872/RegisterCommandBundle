@@ -1,23 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
+use Exception;
 use Fabricio872\RegisterCommand\Helpers\StreamableInput;
 
 class ListInput extends QuestionAbstract
 {
     use StreamableInput;
 
-    private $sttyMode;
+    private string|bool|null $sttyMode = null;
+
     private $stream;
-    private $activeList = [];
-    private $tableExist = false;
-    private $cursor = 0;
+
+    private array $activeList = [];
+
+    private int $cursor = 0;
 
     public function getAnswer()
     {
-        if (!is_array($this->options)) {
-            throw new \Exception('Please provide "options" option in User entity annotation with values in array example: {"ROLE_USER", "ROLE_ADMIN"}');
+        if (! is_array($this->options)) {
+            throw new Exception('Please provide "options" option in User entity annotation with values in array example: {"ROLE_USER", "ROLE_ADMIN"}');
         }
 
         $this->io->writeln("<info> $this->question</info>:");
@@ -37,10 +42,10 @@ class ListInput extends QuestionAbstract
 
         $this->table();
 
-        while (!feof($this->stream) && ($char = fread($this->stream, 1)) != "\n") {
+        while (! feof($this->stream) && ($char = fread($this->stream, 1)) !== "\n") {
             if (" " === $char) {
-                if (in_array($this->options[$this->cursor], $this->activeList)) {
-                    unset($this->activeList[array_search($this->options[$this->cursor], $this->activeList)]);
+                if (in_array($this->options[$this->cursor], $this->activeList, true)) {
+                    unset($this->activeList[array_search($this->options[$this->cursor], $this->activeList, true)]);
                 } else {
                     $this->activeList[] = $this->options[$this->cursor];
                 }
@@ -59,7 +64,7 @@ class ListInput extends QuestionAbstract
     {
         // Did we read an escape sequence?
         $char .= fread($this->stream, 2);
-        if (empty($char[2]) || !in_array($char[2], ['A', 'B'])) {
+        if (empty($char[2]) || ! in_array($char[2], ['A', 'B'], true)) {
             // Input stream was not an arrow key.
             return;
         }
@@ -84,7 +89,7 @@ class ListInput extends QuestionAbstract
 
     private function down()
     {
-        if ($this->cursor < count($this->options) - 1) {
+        if ($this->cursor < (is_countable($this->options) ? count($this->options) : 0) - 1) {
             $this->cursor++;
         }
         $this->table();
@@ -92,11 +97,9 @@ class ListInput extends QuestionAbstract
 
     private function table()
     {
-        if (!$this->tableExist) {
-            $this->io->write(sprintf("\033[%dA", count($this->options)));
-        }
+        $this->io->write(sprintf("\033[%dA", is_countable($this->options) ? count($this->options) : 0));
         foreach ($this->options as $key => $item) {
-            $this->io->writeln(($key == $this->cursor ? ">" : " ") . " [ " . (in_array($item, $this->activeList) ? "X" : " ") . " ] " . $item);
+            $this->io->writeln(($key === $this->cursor ? ">" : " ") . " [ " . (in_array($item, $this->activeList, true) ? "X" : " ") . " ] " . $item);
         }
     }
 }

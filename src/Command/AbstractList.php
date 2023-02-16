@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Command;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,30 +22,37 @@ abstract class AbstractList extends Command
 {
     /** @var string */
     protected $userClassName;
-    /** @var int */
-    private $tableLimit;
-    /** @var int */
-    private $maxColWidth;
+
     /** @var InputInterface */
     protected $input;
+
     /** @var OutputInterface */
     protected $output;
+
     /** @var SymfonyStyle */
     protected $io;
+
     /** @var EntityManagerInterface */
     protected $em;
+
     /** @var int */
     protected $colWidth;
+
     /** @var int */
     protected $totalUsers;
+
     /** @var int */
     protected $limitUsers;
+
     /** @var int */
     protected $currentPage = 0;
+
     /** @var UserPasswordHasherInterface */
     protected $passwordEncoder;
+
     /** @var Reader */
     protected $reader;
+
     /** @var ValidatorInterface */
     protected $validator;
 
@@ -54,15 +64,13 @@ abstract class AbstractList extends Command
      */
     public function __construct(
         string $userClassName,
-        int $tableLimit,
-        int $maxColWidth,
+        private readonly int $tableLimit,
+        private readonly int $maxColWidth,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordEncoder,
         ValidatorInterface $validator
     ) {
         $this->userClassName = $userClassName;
-        $this->tableLimit = $tableLimit;
-        $this->maxColWidth = $maxColWidth;
         $this->em = $em;
         $this->passwordEncoder = $passwordEncoder;
         $this->reader = new AnnotationReader();
@@ -82,14 +90,13 @@ abstract class AbstractList extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;
         $this->io = new SymfonyStyle($this->input, $this->output);
-        /** @var int $colWidth */
         $this->colWidth = $this->input->getOption('col-width');
 
         $this->totalUsers = $this->em
@@ -98,38 +105,31 @@ abstract class AbstractList extends Command
 
         $this->limitUsers = $this->input->getOption('limit');
 
-        if ($this->totalUsers == 0) {
+        if ($this->totalUsers === 0) {
             $this->io->warning("User Table is empty");
             return 0;
         }
 
         $userClass = new $this->userClassName();
-        if (!$userClass instanceof UserInterface) {
-            throw new \Exception("Provided user must implement " . UserInterface::class);
+        if (! $userClass instanceof UserInterface) {
+            throw new Exception("Provided user must implement " . UserInterface::class);
         }
 
         return $this->draw(null);
     }
 
-    /**
-     * @return string
-     */
     protected function askPage(): string
     {
         return $this->io->ask('page', ($this->currentPage < $this->getTotalPages()) ? $this->currentPage + 1 : 'q');
     }
 
-    /**
-     * @return false|float
-     */
-    protected function getTotalPages()
+    protected function getTotalPages(): false|float
     {
         return ceil($this->totalUsers / $this->limitUsers);
     }
 
     /**
      * @param int $page
-     * @return int
      */
     abstract protected function draw(?int $page): int;
 }
