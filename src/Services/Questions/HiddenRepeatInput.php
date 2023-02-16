@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
 class HiddenRepeatInput extends QuestionAbstract
@@ -13,7 +15,7 @@ class HiddenRepeatInput extends QuestionAbstract
     {
         $q0 = $this->io->askHidden($this->question);
         $q1 = $this->io->askHidden($this->question . ' again');
-        if ($q0 != $q1) {
+        if ($q0 !== $q1) {
             $this->io->warning("Fields doesn't match");
             $this->validated();
         }

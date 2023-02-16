@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Serializer;
 
+use DateTime;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UserEntityNormalizer implements NormalizerInterface
@@ -25,7 +28,7 @@ class UserEntityNormalizer implements NormalizerInterface
         if (is_numeric($property)) {
             return $property;
         }
-        if (is_null($property)) {
+        if (null === $property) {
             return 'NULL';
         }
         if (is_array($property)) {
@@ -37,7 +40,7 @@ class UserEntityNormalizer implements NormalizerInterface
         if (is_bool($property)) {
             return $property ? 'Yes' : 'No';
         }
-        if ($property instanceof \DateTime) {
+        if ($property instanceof DateTime) {
             return $property->format('c');
         }
 

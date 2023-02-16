@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Services\Questions;
 
 class ArrayInput extends QuestionAbstract
 {
-    private $values = [];
+    private array $values = [];
 
     public function getAnswer(): array
     {
@@ -16,7 +18,7 @@ class ArrayInput extends QuestionAbstract
     private function ask()
     {
         $value = $this->io->ask('value ' . count($this->values) . ' (press <return> to stop adding fields)');
-        if ($value != null) {
+        if ($value !== null) {
             $this->values[] = $value;
             $this->ask();
         }

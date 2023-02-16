@@ -1,8 +1,8 @@
 <?php
 
-namespace Fabricio872\RegisterCommand\Services\Questions;
+declare(strict_types=1);
 
-use Symfony\Component\Console\Style\SymfonyStyle;
+namespace Fabricio872\RegisterCommand\Services\Questions;
 
 class HiddenInput extends QuestionAbstract
 {

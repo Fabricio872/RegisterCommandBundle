@@ -1,34 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Fabricio872\RegisterCommand\Command;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Fabricio872\RegisterCommand\Services\Ask;
 use Fabricio872\RegisterCommand\Services\StaticMethods;
+use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserRegisterCommand extends Command
 {
     protected static $defaultDescription = 'Register new user';
-    /** @var string $userClassName */
-    private $userClassName;
-    /** @var UserPasswordHasherInterface $passwordEncoder */
-    private $passwordEncoder;
-    /** @var Reader $reader */
-    private $reader;
-    /** @var SymfonyStyle $io */
-    private $io;
-    /** @var EntityManagerInterface $em */
-    private $em;
-    /** @var ValidatorInterface */
-    private $validator;
+
+    private ?SymfonyStyle $io = null;
 
     /**
      * UserRegisterCommand constructor.
@@ -38,18 +34,13 @@ class UserRegisterCommand extends Command
      * @param EntityManagerInterface $em
      */
     public function __construct(
-        string $userClassName,
-        UserPasswordHasherInterface $passwordEncoder,
-        Reader $reader,
-        EntityManagerInterface $em,
-        ValidatorInterface $validator
+        private readonly string $userClassName,
+        private readonly UserPasswordHasherInterface $passwordEncoder,
+        private readonly Reader $reader,
+        private readonly EntityManagerInterface $em,
+        private readonly ValidatorInterface $validator
     ) {
-        $this->userClassName = $userClassName;
         parent::__construct();
-        $this->passwordEncoder = $passwordEncoder;
-        $this->reader = $reader;
-        $this->em = $em;
-        $this->validator = $validator;
     }
 
     protected function configure()
@@ -61,18 +52,18 @@ class UserRegisterCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \ReflectionException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ReflectionException
+     * @throws ExceptionInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $userClassReflection = new \ReflectionClass($this->userClassName);
+        $userClassReflection = new ReflectionClass($this->userClassName);
 
         $userClass = new $this->userClassName();
-        if (!$userClass instanceof UserInterface) {
-            throw new \Exception("Provided user must implement " . UserInterface::class);
+        if (! $userClass instanceof UserInterface) {
+            throw new Exception("Provided user must implement " . UserInterface::class);
         }
 
         $data = [];
