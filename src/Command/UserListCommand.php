@@ -9,20 +9,20 @@ use Fabricio872\RegisterCommand\Services\Ask;
 use Fabricio872\RegisterCommand\Services\StaticMethods;
 use Fabricio872\RegisterCommand\Services\UserEditor;
 use Fabricio872\RegisterCommand\Services\UserEditorInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(
+    name: 'user:list',
+    description: 'List all existing users',
+)]
 class UserListCommand extends AbstractList
 {
-    protected static $defaultName = 'user:list';
-
-    protected static $defaultDescription = 'List all existing users';
-
     /** @var array|object[] */
     private ?array $userList = null;
 
     protected function configure()
     {
         parent::configure();
-        $this->setDescription(self::$defaultDescription);
     }
 
     /**

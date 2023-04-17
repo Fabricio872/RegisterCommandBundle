@@ -41,10 +41,9 @@ class Ask
     }
 
     /**
-     * @return string|array|int|float|null
      * @throws ReflectionException
      */
-    public function ask(string $propertyName)
+    public function ask(string $propertyName): string|array|int|float|null
     {
         $userReflection = new ReflectionClass($this->userClassName);
         $annotation = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
