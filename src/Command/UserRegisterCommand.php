@@ -11,6 +11,7 @@ use Fabricio872\RegisterCommand\Services\Ask;
 use Fabricio872\RegisterCommand\Services\StaticMethods;
 use ReflectionClass;
 use ReflectionException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,10 +21,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[AsCommand(
+    name: 'user:register',
+    description: 'Register new user',
+)]
 class UserRegisterCommand extends Command
 {
-    protected static $defaultDescription = 'Register new user';
-
     private ?SymfonyStyle $io = null;
 
     /**
@@ -41,11 +44,6 @@ class UserRegisterCommand extends Command
         private readonly ValidatorInterface $validator
     ) {
         parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this->setDescription(self::$defaultDescription);
     }
 
     /**
