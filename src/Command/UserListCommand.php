@@ -20,7 +20,7 @@ class UserListCommand extends AbstractList
     /** @var array|object[] */
     private ?array $userList = null;
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
     }
