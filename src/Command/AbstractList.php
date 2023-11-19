@@ -78,7 +78,7 @@ abstract class AbstractList extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('page', InputArgument::OPTIONAL, 'Page', 1)
