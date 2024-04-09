@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Fabricio872\RegisterCommand\Services;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Id;
 use Exception;
 use Fabricio872\RegisterCommand\Helpers\StreamableInput;
 use ReflectionClass;
@@ -97,7 +96,7 @@ class UserEditor implements UserEditorInterface
             foreach (array_values(StaticMethods::userToArray($user)) as $col => $item) {
                 $userArray[$row][array_keys(StaticMethods::userToArray($user))[$col]] = (($this->cursor === [$row, $col]) ? "> " : "  ") . $item;
             }
-            $this->cursorEnd[1] = StaticMethods::userToArray($user) === null ? 0 : count(StaticMethods::userToArray($user));
+            $this->cursorEnd[1] = empty(StaticMethods::userToArray($user)) ? 0 : count(StaticMethods::userToArray($user));
         }
         if (! $userArray) {
             $this->output->writeln([
@@ -237,13 +236,6 @@ class UserEditor implements UserEditorInterface
         $userReflection = new ReflectionClass($this->ask->getUserClassName());
         $user = $this->userList[$this->cursor[0]];
 
-        foreach ($userReflection->getProperties() as $property) {
-            $annotation = $this->ask->getReader()->getPropertyAnnotation($property, Id::class);
-            if ($annotation) {
-                $property->setAccessible(true);
-                $identifier = $property->getValue($user);
-            }
-        }
         foreach ($userReflection->getProperties() as $property) {
             $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), $property->getName());
             if ($annotation && $annotation->userIdentifier === true) {

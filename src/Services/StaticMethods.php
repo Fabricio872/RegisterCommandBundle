@@ -5,9 +5,8 @@ declare(strict_types=1);
 
 namespace Fabricio872\RegisterCommand\Services;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use DateTimeInterface;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
-use Fabricio872\RegisterCommand\Serializer\UserEntityNormalizer;
 use ReflectionClass;
 use Stringable;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -43,10 +42,11 @@ class StaticMethods
         }
         return $arrayOfUser;
     }
+
     private static function processProperty($property)
     {
         if ($property instanceof Stringable) {
-            return (string)$property;
+            return (string) $property;
         }
         if (is_numeric($property)) {
             return $property;
@@ -63,12 +63,13 @@ class StaticMethods
         if (is_bool($property)) {
             return $property ? 'Yes' : 'No';
         }
-        if ($property instanceof DateTime) {
+        if ($property instanceof DateTimeInterface) {
             return $property->format('c');
         }
 
         return 'Unknown datatype';
     }
+
     public static function getSerializer(): Serializer
     {
         if (! isset(self::$serializer)) {

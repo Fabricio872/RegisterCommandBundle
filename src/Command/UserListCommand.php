@@ -116,8 +116,7 @@ class UserListCommand extends AbstractList
             $this->io,
             $this->input,
             $this->output,
-            $this->passwordEncoder,
-            $this->validator
+            $this->passwordEncoder
         );
     }
 }

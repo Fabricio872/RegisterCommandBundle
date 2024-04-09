@@ -18,7 +18,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsCommand(
     name: 'user:register',
@@ -37,8 +36,7 @@ class UserRegisterCommand extends Command
     public function __construct(
         private readonly string $userClassName,
         private readonly UserPasswordHasherInterface $passwordEncoder,
-        private readonly EntityManagerInterface $em,
-        private readonly ValidatorInterface $validator
+        private readonly EntityManagerInterface $em
     ) {
         parent::__construct();
     }
@@ -67,8 +65,7 @@ class UserRegisterCommand extends Command
             $this->io,
             $input,
             $output,
-            $this->passwordEncoder,
-            $this->validator
+            $this->passwordEncoder
         );
         foreach ($userClassReflection->getProperties() as $property) {
             $data[$property->getName()] = $ask->ask($property->getName());

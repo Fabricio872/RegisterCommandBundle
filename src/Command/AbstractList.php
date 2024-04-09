@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractList extends Command
 {
@@ -48,9 +47,6 @@ abstract class AbstractList extends Command
     /** @var UserPasswordHasherInterface */
     protected $passwordEncoder;
 
-    /** @var ValidatorInterface */
-    protected $validator;
-
     /**
      * @param string $userClassName
      * @param int $tableLimit
@@ -62,13 +58,11 @@ abstract class AbstractList extends Command
         private readonly int $tableLimit,
         private readonly int $maxColWidth,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $passwordEncoder,
-        ValidatorInterface $validator
+        UserPasswordHasherInterface $passwordEncoder
     ) {
         $this->userClassName = $userClassName;
         $this->em = $em;
         $this->passwordEncoder = $passwordEncoder;
-        $this->validator = $validator;
         parent::__construct();
     }
 
