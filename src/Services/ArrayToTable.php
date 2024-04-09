@@ -25,7 +25,7 @@ class ArrayToTable
         }
         $table->setHeaders(array_keys($this->array[0]));
 
-        $table->setRows(array_map(fn ($user) => StaticMethods::getSerializer()->normalize($user), $this->array));
+        $table->setRows($this->array);
         $table->setStyle('box');
 
         return $table;

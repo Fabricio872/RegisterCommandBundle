@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace Fabricio872\RegisterCommand\Services;
 
 use DateTime;
-use Doctrine\Common\Annotations\Reader;
 use Exception;
 use Fabricio872\RegisterCommand\Annotations\RegisterCommand;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionAbstract;
 use Fabricio872\RegisterCommand\Services\Questions\QuestionInterface;
-use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Ask
 {
@@ -26,12 +21,10 @@ class Ask
 
     public function __construct(
         private readonly string $userClassName,
-        private readonly Reader $reader,
         private readonly SymfonyStyle $io,
         private readonly InputInterface $input,
         private readonly OutputInterface $output,
         private readonly UserPasswordHasherInterface $passwordEncoder,
-        private readonly ValidatorInterface $validator
     ) {
     }
 
@@ -45,30 +38,25 @@ class Ask
      */
     public function ask(string $propertyName): string|array|int|float|null
     {
-        $userReflection = new ReflectionClass($this->userClassName);
-        $annotation = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
+        $registerCommand = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
 
-        if ($annotation === null) {
+        if ($registerCommand === null) {
             return null;
         }
-        if ($value = $this->getDefaultValue($annotation)) {
+        if ($value = $this->getDefaultValue($registerCommand)) {
             return $value;
         }
 
         /** @var QuestionAbstract $question */
-        $question = $this->makeQuestion($annotation, $propertyName);
+        $question = $this->makeQuestion($registerCommand, $propertyName);
 
         if (! $question instanceof QuestionAbstract) {
             throw new Exception('Input class: ' . $question::class . ' must implement ' . QuestionInterface::class);
         }
 
-        if ($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) {
-            $answer = $this->validate($question, $userReflection, $propertyName);
-        } else {
-            $answer = $question->getAnswer();
-        }
+        $answer = $question->getAnswer();
 
-        if ($annotation->userIdentifier) {
+        if ($registerCommand->userIdentifier) {
             $this->userIdentifier = ' ' . $answer . ' ';
         }
 
@@ -78,11 +66,6 @@ class Ask
     public function getUserClassName(): string
     {
         return $this->userClassName;
-    }
-
-    public function getReader(): Reader
-    {
-        return $this->reader;
     }
 
     private function makeQuestion(RegisterCommand $annotation, string $propertyName): QuestionInterface
@@ -132,37 +115,5 @@ class Ask
             'valueDateTime' => new DateTime($value),
             default => throw new Exception("Unsupported value type: " . $annotation),
         };
-    }
-
-    private function validate(QuestionInterface $question, ReflectionClass $userReflection, string $propertyName)
-    {
-        $answer = $question->getAnswer();
-
-        /** @var ConstraintViolation $violation */
-        foreach (
-            $this->validator->validate(
-                $answer,
-                array_filter(
-                    array_map(
-                        function ($annotation) {
-                            if ($annotation instanceof Constraint) {
-                                return $annotation;
-                            }
-                            return null;
-                        },
-                        $this->reader->getPropertyAnnotations(
-                            $userReflection->getProperty($propertyName)
-                        )
-                    )
-                )
-            )
-            as $violation) {
-            $this->io->warning($violation->getMessage());
-        }
-
-        if (isset($violation)) {
-            return $this->validate($question, $userReflection, $propertyName);
-        }
-        return $answer;
     }
 }

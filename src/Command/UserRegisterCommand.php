@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Fabricio872\RegisterCommand\Command;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Fabricio872\RegisterCommand\Services\Ask;
@@ -19,7 +18,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsCommand(
     name: 'user:register',
@@ -33,15 +31,12 @@ class UserRegisterCommand extends Command
      * UserRegisterCommand constructor.
      * @param string $userClassName
      * @param UserPasswordHasherInterface $passwordEncoder
-     * @param Reader $reader
      * @param EntityManagerInterface $em
      */
     public function __construct(
         private readonly string $userClassName,
         private readonly UserPasswordHasherInterface $passwordEncoder,
-        private readonly Reader $reader,
-        private readonly EntityManagerInterface $em,
-        private readonly ValidatorInterface $validator
+        private readonly EntityManagerInterface $em
     ) {
         parent::__construct();
     }
@@ -67,12 +62,10 @@ class UserRegisterCommand extends Command
         $data = [];
         $ask = new Ask(
             $this->userClassName,
-            $this->reader,
             $this->io,
             $input,
             $output,
-            $this->passwordEncoder,
-            $this->validator
+            $this->passwordEncoder
         );
         foreach ($userClassReflection->getProperties() as $property) {
             $data[$property->getName()] = $ask->ask($property->getName());

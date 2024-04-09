@@ -41,7 +41,7 @@ class UserListCommand extends AbstractList
 
         $userArray = [];
         foreach ($this->userList as $user) {
-            $userArray[] = StaticMethods::getSerializer()->normalize($user);
+            $userArray[] = StaticMethods::userToArray($user);
         }
         $objectToTable = new ArrayToTable(
             $userArray,
@@ -113,12 +113,10 @@ class UserListCommand extends AbstractList
     {
         return new Ask(
             $this->userClassName,
-            $this->reader,
             $this->io,
             $this->input,
             $this->output,
-            $this->passwordEncoder,
-            $this->validator
+            $this->passwordEncoder
         );
     }
 }
