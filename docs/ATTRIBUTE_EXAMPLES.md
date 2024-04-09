@@ -47,7 +47,7 @@ To field to be asked from terminal you have to set "field" to one of those input
      * @ORM\Column(type="string", length=180, unique=true)
      */
     #[RegisterCommand(
-        field: "hiddenRepeated"
+        field: "hiddenRepeat"
     )]
     private $hiddenRepeatedValue;
 // ...

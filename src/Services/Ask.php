@@ -26,7 +26,6 @@ class Ask
 
     public function __construct(
         private readonly string $userClassName,
-        private readonly Reader $reader,
         private readonly SymfonyStyle $io,
         private readonly InputInterface $input,
         private readonly OutputInterface $output,
@@ -46,29 +45,25 @@ class Ask
     public function ask(string $propertyName): string|array|int|float|null
     {
         $userReflection = new ReflectionClass($this->userClassName);
-        $annotation = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
+        $registerCommand = StaticMethods::getRegisterCommand($this->userClassName, $propertyName);
 
-        if ($annotation === null) {
+        if ($registerCommand === null) {
             return null;
         }
-        if ($value = $this->getDefaultValue($annotation)) {
+        if ($value = $this->getDefaultValue($registerCommand)) {
             return $value;
         }
 
         /** @var QuestionAbstract $question */
-        $question = $this->makeQuestion($annotation, $propertyName);
+        $question = $this->makeQuestion($registerCommand, $propertyName);
 
         if (! $question instanceof QuestionAbstract) {
             throw new Exception('Input class: ' . $question::class . ' must implement ' . QuestionInterface::class);
         }
 
-        if ($this->reader->getPropertyAnnotation($userReflection->getProperty($propertyName), Constraint::class)) {
-            $answer = $this->validate($question, $userReflection, $propertyName);
-        } else {
-            $answer = $question->getAnswer();
-        }
+        $answer = $question->getAnswer();
 
-        if ($annotation->userIdentifier) {
+        if ($registerCommand->userIdentifier) {
             $this->userIdentifier = ' ' . $answer . ' ';
         }
 

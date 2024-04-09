@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Fabricio872\RegisterCommand\Command;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Fabricio872\RegisterCommand\Services\Ask;
@@ -33,13 +32,11 @@ class UserRegisterCommand extends Command
      * UserRegisterCommand constructor.
      * @param string $userClassName
      * @param UserPasswordHasherInterface $passwordEncoder
-     * @param Reader $reader
      * @param EntityManagerInterface $em
      */
     public function __construct(
         private readonly string $userClassName,
         private readonly UserPasswordHasherInterface $passwordEncoder,
-        private readonly Reader $reader,
         private readonly EntityManagerInterface $em,
         private readonly ValidatorInterface $validator
     ) {
@@ -67,7 +64,6 @@ class UserRegisterCommand extends Command
         $data = [];
         $ask = new Ask(
             $this->userClassName,
-            $this->reader,
             $this->io,
             $input,
             $output,

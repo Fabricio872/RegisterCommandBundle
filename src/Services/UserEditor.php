@@ -94,10 +94,10 @@ class UserEditor implements UserEditorInterface
         $userArray = [];
         $this->cursorEnd[0] = count($this->userList);
         foreach ($this->userList as $row => $user) {
-            foreach (StaticMethods::getSerializer()->normalize(StaticMethods::getSerializer()->normalize($user)) as $col => $item) {
-                $userArray[$row][array_keys(StaticMethods::getSerializer()->normalize($user))[$col]] = (($this->cursor === [$row, $col]) ? "> " : "  ") . $item;
+            foreach (array_values(StaticMethods::userToArray($user)) as $col => $item) {
+                $userArray[$row][array_keys(StaticMethods::userToArray($user))[$col]] = (($this->cursor === [$row, $col]) ? "> " : "  ") . $item;
             }
-            $this->cursorEnd[1] = StaticMethods::getSerializer()->normalize($user) === null ? 0 : count(StaticMethods::getSerializer()->normalize($user));
+            $this->cursorEnd[1] = StaticMethods::userToArray($user) === null ? 0 : count(StaticMethods::userToArray($user));
         }
         if (! $userArray) {
             $this->output->writeln([
@@ -204,9 +204,9 @@ class UserEditor implements UserEditorInterface
         $io = new SymfonyStyle($this->input, $this->output);
         $user = $this->userList[$this->cursor[0]];
         try {
-            $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), array_keys(StaticMethods::getSerializer()->normalize($user))[$this->cursor[1]]);
+            $annotation = StaticMethods::getRegisterCommand($this->ask->getUserClassName(), array_keys(StaticMethods::userToArray($user))[$this->cursor[1]]);
             $userReflection = new ReflectionClass($this->ask->getUserClassName());
-            $property = $userReflection->getProperty(array_keys(StaticMethods::getSerializer()->normalize($user))[$this->cursor[1]]);
+            $property = $userReflection->getProperty(array_keys(StaticMethods::userToArray($user))[$this->cursor[1]]);
             if (
                 $annotation &&
                 $annotation->field

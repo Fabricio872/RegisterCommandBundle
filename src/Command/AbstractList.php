@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Fabricio872\RegisterCommand\Command;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Command\Command;
@@ -50,9 +48,6 @@ abstract class AbstractList extends Command
     /** @var UserPasswordHasherInterface */
     protected $passwordEncoder;
 
-    /** @var Reader */
-    protected $reader;
-
     /** @var ValidatorInterface */
     protected $validator;
 
@@ -73,7 +68,6 @@ abstract class AbstractList extends Command
         $this->userClassName = $userClassName;
         $this->em = $em;
         $this->passwordEncoder = $passwordEncoder;
-        $this->reader = new AnnotationReader();
         $this->validator = $validator;
         parent::__construct();
     }
